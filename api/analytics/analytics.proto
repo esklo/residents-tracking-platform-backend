@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package analytics;
+
+option go_package = "github.com/esklo/residents-tracking-platform/gen/proto/analytics";
+
+import "theme/theme.proto";
+import "google/protobuf/timestamp.proto";
+
+service AnalyticsService {
+  rpc RequestsPerTheme(RequestsPerThemeRequest) returns (RequestsPerThemeResponse) {};
+}
+
+message RequestsPerThemeRequest {
+  google.protobuf.Timestamp from = 1;
+  google.protobuf.Timestamp to = 2;
+}
+
+message RequestsPerThemeResponse {
+  repeated RequestsPerTheme data = 1;
+}
+
+message RequestsPerTheme {
+  int64 count = 1;
+  theme.Theme theme = 2;
+}

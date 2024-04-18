@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package geo;
+
+option go_package = "github.com/esklo/residents-tracking-platform/gen/proto/geo";
+
+import "empty/empty.proto";
+
+service GeoService {
+  rpc BuildingsByCoordinates(GeoPoint) returns (BuildingByCoordinatesResponse);
+  rpc GetAdministrativeDistricts(empty.Empty) returns (GetDistrictsResponse);
+  rpc GetDistricts(GetDistrictsRequest) returns (GetDistrictsResponse);
+  rpc Suggest(SuggestRequest) returns (SuggestResponse);
+  rpc GeoLocate(GeoPoint) returns (GeoLocateResponse);
+}
+
+message GeoLocateResponse {
+  optional SuggestItem item = 1;
+}
+
+message SuggestRequest {
+  string query = 1;
+}
+
+message SuggestResponse {
+  repeated SuggestItem items = 1;
+}
+
+message SuggestItem {
+  string address = 1;
+  GeoPoint geo = 2;
+}
+
+message GeoBuilding  {
+  string street = 1;
+  string house = 2;
+  repeated GeoPoint geometry = 3;
+}
+
+message GeoPoint {
+  float latitude = 1;
+  float longitude = 2;
+}
+
+message GeoDistrict {
+  int64 id = 1;
+  string name = 2;
+}
+
+message BuildingByCoordinatesResponse {
+  repeated GeoBuilding buildings = 1;
+}
+
+message GetDistrictsResponse {
+  repeated GeoDistrict districts = 1;
+}
+
+message GetDistrictsRequest {
+  int64 administrative_district_id = 1;
+}
+

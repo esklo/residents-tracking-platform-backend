@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package request;
+
+option go_package = "github.com/esklo/residents-tracking-platform/gen/proto/request";
+
+import "empty/empty.proto";
+import "geo/geo.proto";
+import "contact/contact.proto";
+import "file/file.proto";
+import "google/protobuf/timestamp.proto";
+
+service RequestService {
+  rpc Create(CreateRequest) returns (Request);
+  rpc GetById(ByIdRequest) returns (Request);
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Update(Request) returns (Request);
+  rpc Delete(ByIdRequest) returns (empty.Empty);
+  rpc GetAsGeoJson(GetRequest) returns (GetAsGeoJsonResponse);
+}
+
+message GetAsGeoJsonResponse {
+  bytes geojson = 1;
+}
+
+message CreateRequest {
+  string description = 1;
+  geo.GeoPoint geo = 2;
+  string address = 3;
+  string theme_id = 4;
+  contact.Contact contact = 5;
+  repeated string files = 6;
+}
+
+message ByIdRequest {
+  string id = 1;
+}
+
+message GetRequest {
+  optional int64 limit = 1;
+  optional int64 offset = 2;
+}
+
+message GetResponse {
+  repeated Request requests = 1;
+}
+
+enum Status {
+  StatusUnknown = 0;
+  StatusOpen = 1;
+  StatusClosed = 2;
+  StatusDeclined = 3;
+}
+
+enum Priority {
+  PriorityUnknown = 0;
+  PriorityDefault = 1;
+  PriorityLow = 2;
+  PriorityHigh = 3;
+}
+
+
+message Request {
+  string id = 1;
+  string description = 2;
+  geo.GeoPoint geo = 3;
+  string address = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp deleted_at = 6;
+  Status status = 7;
+  Priority priority = 8;
+  string theme_id = 9;
+  string user_id = 10;
+  contact.Contact contact = 11;
+  repeated file.File files = 12;
+}

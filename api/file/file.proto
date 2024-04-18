@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package file;
+
+option go_package = "github.com/esklo/residents-tracking-platform/gen/proto/file";
+
+import "empty/empty.proto";
+
+service FileService {
+  rpc Upload(UploadRequest) returns (File);
+  rpc GetById(ByIdRequest) returns (File);
+  rpc Delete(ByIdRequest) returns (empty.Empty);
+}
+
+message UploadRequest {
+  string filename = 1;
+  bytes file = 2;
+}
+
+message ByIdRequest {
+  string id = 1;
+}
+
+message GetRequest {
+  int64 limit = 1;
+  int64 offset = 2;
+}
+
+message File {
+  string id = 1;
+  string filename = 2;
+  string mimetype = 3;
+  string extension = 4;
+  string url = 5;
+}

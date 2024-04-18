@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package empty;
+
+option go_package = "github.com/esklo/residents-tracking-platform/gen/proto/empty";
+
+message Empty {}

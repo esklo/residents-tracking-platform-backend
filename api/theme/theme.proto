@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package theme;
+
+option go_package = "github.com/esklo/residents-tracking-platform/gen/proto/theme";
+
+import "empty/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service ThemeService {
+  rpc Create(CreateRequest) returns (Theme);
+  rpc GetById(ByIdRequest) returns (Theme);
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Update(Theme) returns (Theme);
+  rpc Delete(ByIdRequest) returns (empty.Empty);
+}
+
+message CreateRequest {
+  string title = 1;
+  int64 priority = 2;
+  string department_id = 3;
+}
+
+message ByIdRequest {
+  string id = 1;
+}
+
+message GetRequest {
+  optional int64 limit = 1;
+  optional int64 offset = 2;
+}
+
+message GetResponse {
+  repeated Theme themes = 1;
+}
+
+message Theme {
+  string id = 1;
+  string title = 2;
+  int64 priority = 3;
+  string department_id = 4;
+  optional google.protobuf.Timestamp deleted_at = 5;
+}

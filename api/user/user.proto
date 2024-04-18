@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "github.com/esklo/residents-tracking-platform/gen/proto/user";
+
+import "empty/empty.proto";
+
+service UserService {
+  rpc GetMe(empty.Empty) returns (User);
+  rpc Create(CreateRequest) returns (User);
+  rpc GetById(ByIdRequest) returns (User);
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Update(UpdateRequest) returns (User);
+  rpc Delete(ByIdRequest) returns (User);
+}
+
+message CreateRequest {
+  Role role = 1;
+  string department_id = 2;
+  string email = 3;
+  string first_name = 4;
+  optional string last_name = 5;
+  optional string father_name = 6;
+  string password = 7;
+}
+
+message UpdateRequest {
+  string id = 1;
+  optional Role role = 2;
+  optional string email = 3;
+  optional string first_name = 4;
+  optional string last_name = 5;
+  optional string father_name = 6;
+  optional string department_id = 7;
+  optional string password = 8;
+}
+
+message ByIdRequest {
+  string id = 1;
+}
+
+message GetRequest {
+  optional int64 limit = 1;
+  optional int64 offset = 2;
+}
+
+message GetResponse {
+  repeated User users = 1;
+}
+
+enum Role {
+  UnknownRole = 0;
+  EmployeeRole = 1;
+  AdminRole = 2;
+}
+
+message User {
+  string id = 1;
+  Role role = 2;
+  string email = 3;
+  string first_name = 4;
+  optional string last_name = 5;
+  optional string father_name = 6;
+  optional string department_id = 7;
+}

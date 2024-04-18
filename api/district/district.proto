@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package district;
+
+option go_package = "github.com/esklo/residents-tracking-platform/gen/proto/district";
+
+import "empty/empty.proto";
+
+service DistrictService {
+  rpc Create(CreateRequest) returns (District);
+  rpc GetById(ByIdRequest) returns (District);
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Update(District) returns (District);
+  rpc Delete(ByIdRequest) returns (empty.Empty);
+}
+
+message ByIdRequest {
+  string id = 1;
+}
+
+message GetRequest {
+  optional int64 limit = 1;
+  optional int64 offset = 2;
+}
+
+message GetResponse {
+  repeated District districts = 1;
+}
+
+message District {
+  string id = 1;
+  string title = 2;
+  bytes geojson = 3;
+  optional string coat_of_arms_file_id = 4;
+}
+
+message CreateRequest {
+  int64 area_id = 1;
+  optional string coat_of_arms_file_id = 2;
+}

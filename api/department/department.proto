@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package department;
+
+option go_package = "github.com/esklo/residents-tracking-platform/gen/proto/department";
+
+import "empty/empty.proto";
+
+service DepartmentService {
+  rpc Create(CreateRequest) returns (Department);
+  rpc GetById(ByIdRequest) returns (Department);
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Update(Department) returns (Department);
+  rpc Delete(ByIdRequest) returns (empty.Empty);
+}
+message CreateRequest {
+  string title = 1;
+  string district_id = 2;
+}
+
+message ByIdRequest {
+  string id = 1;
+}
+
+message GetRequest {
+  optional int64 limit = 1;
+  optional int64 offset = 2;
+}
+
+message GetResponse {
+  repeated Department departments = 1;
+}
+
+message Department {
+  string id = 1;
+  string title = 2;
+  string district_id = 3;
+}

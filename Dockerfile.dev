@@ -1,0 +1,16 @@
+FROM golang:1.21
+
+
+ENV DEV_MODE=true
+
+
+WORKDIR /app
+
+COPY . .
+
+RUN go mod download
+
+
+EXPOSE 8080
+
+CMD if [ "$DEV_MODE" = "true" ]; then go get github.com/githubnemo/CompileDaemon && go install github.com/githubnemo/CompileDaemon && CompileDaemon -build="go build -o /exec cmd/api/main.go" -command="/exec"; else go build -o /exec && /exec; fi
