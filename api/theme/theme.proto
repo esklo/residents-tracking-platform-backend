@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package theme;
 
-option go_package = "github.com/esklo/residents-tracking-platform/gen/proto/theme";
+option go_package = "github.com/esklo/residents-tracking-platform-backend/gen/proto/theme";
 
 import "empty/empty.proto";
 import "google/protobuf/timestamp.proto";

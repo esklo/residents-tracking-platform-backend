@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package contact;
 
-option go_package = "github.com/esklo/residents-tracking-platform/gen/proto/contact";
+option go_package = "github.com/esklo/residents-tracking-platform-backend/gen/proto/contact";
 
 import "empty/empty.proto";
 

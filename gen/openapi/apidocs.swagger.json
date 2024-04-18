@@ -1,10 +1,13 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "auth/auth.proto",
+    "title": "analytics/analytics.proto",
     "version": "version not set"
   },
   "tags": [
+    {
+      "name": "AnalyticsService"
+    },
     {
       "name": "AuthService"
     },
@@ -40,6 +43,38 @@
     "application/json"
   ],
   "paths": {
+    "/analytics.AnalyticsService/RequestsPerTheme": {
+      "post": {
+        "operationId": "AnalyticsService_RequestsPerTheme",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/analyticsRequestsPerThemeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/analyticsRequestsPerThemeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AnalyticsService"
+        ]
+      }
+    },
     "/auth.AuthService/ChangePassword": {
       "post": {
         "operationId": "AuthService_ChangePassword",
@@ -1578,6 +1613,43 @@
     }
   },
   "definitions": {
+    "analyticsRequestsPerTheme": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "string",
+          "format": "int64"
+        },
+        "theme": {
+          "$ref": "#/definitions/themeTheme"
+        }
+      }
+    },
+    "analyticsRequestsPerThemeRequest": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "to": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "analyticsRequestsPerThemeResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/analyticsRequestsPerTheme"
+          }
+        }
+      }
+    },
     "authChangePasswordRequest": {
       "type": "object",
       "properties": {

@@ -1,7 +1,7 @@
 package model
 
 import (
-	protoDepartment "github.com/esklo/residents-tracking-platform/gen/proto/department"
+	protoDepartment "github.com/esklo/residents-tracking-platform-backend/gen/proto/department"
 	"github.com/google/uuid"
 )
 

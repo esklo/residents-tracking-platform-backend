@@ -2,7 +2,7 @@ package auth
 
 import (
 	"context"
-	"github.com/esklo/residents-tracking-platform/internal/model"
+	"github.com/esklo/residents-tracking-platform-backend/internal/model"
 )
 
 func (s *Service) Login(ctx context.Context, email, password string) (*model.User, error) {

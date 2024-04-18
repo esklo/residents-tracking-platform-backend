@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package auth;
 
-option go_package = "github.com/esklo/residents-tracking-platform/gen/proto/auth";
+option go_package = "github.com/esklo/residents-tracking-platform-backend/gen/proto/auth";
 
 import "empty/empty.proto";
 import "user/user.proto";

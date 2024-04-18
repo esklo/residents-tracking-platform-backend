@@ -1,7 +1,7 @@
 package model
 
 import (
-	protoAuth "github.com/esklo/residents-tracking-platform/gen/proto/auth"
+	protoAuth "github.com/esklo/residents-tracking-platform-backend/gen/proto/auth"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"

@@ -1,7 +1,7 @@
 package model
 
 import (
-	protoDistrict "github.com/esklo/residents-tracking-platform/gen/proto/district"
+	protoDistrict "github.com/esklo/residents-tracking-platform-backend/gen/proto/district"
 	"github.com/google/uuid"
 	"github.com/paulmach/orb/geojson"
 )

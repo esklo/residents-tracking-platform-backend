@@ -1,8 +1,8 @@
 package auth
 
 import (
-	proto "github.com/esklo/residents-tracking-platform/gen/proto/auth"
-	"github.com/esklo/residents-tracking-platform/internal/service"
+	proto "github.com/esklo/residents-tracking-platform-backend/gen/proto/auth"
+	"github.com/esklo/residents-tracking-platform-backend/internal/service"
 )
 
 type Implementation struct {

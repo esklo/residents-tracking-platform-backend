@@ -1,4 +1,4 @@
-MODULE:="github.com/esklo/residents-tracking-platform"
+MODULE:="github.com/esklo/residents-tracking-platform-backend"
 generate:
 	rm -rf gen/*
 	mkdir gen/proto gen/openapi

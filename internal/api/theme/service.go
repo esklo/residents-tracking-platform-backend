@@ -2,10 +2,10 @@ package theme
 
 import (
 	"context"
-	"github.com/esklo/residents-tracking-platform/gen/proto/empty"
-	proto "github.com/esklo/residents-tracking-platform/gen/proto/theme"
-	"github.com/esklo/residents-tracking-platform/internal/model"
-	"github.com/esklo/residents-tracking-platform/internal/service"
+	"github.com/esklo/residents-tracking-platform-backend/gen/proto/empty"
+	proto "github.com/esklo/residents-tracking-platform-backend/gen/proto/theme"
+	"github.com/esklo/residents-tracking-platform-backend/internal/model"
+	"github.com/esklo/residents-tracking-platform-backend/internal/service"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )

@@ -3,10 +3,10 @@ package file
 import (
 	"bytes"
 	"context"
-	"github.com/esklo/residents-tracking-platform/internal/model"
-	"github.com/esklo/residents-tracking-platform/internal/repository"
-	def "github.com/esklo/residents-tracking-platform/internal/service"
-	"github.com/esklo/residents-tracking-platform/internal/storage"
+	"github.com/esklo/residents-tracking-platform-backend/internal/model"
+	"github.com/esklo/residents-tracking-platform-backend/internal/repository"
+	def "github.com/esklo/residents-tracking-platform-backend/internal/service"
+	"github.com/esklo/residents-tracking-platform-backend/internal/storage"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )

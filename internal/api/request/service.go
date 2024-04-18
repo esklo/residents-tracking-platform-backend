@@ -2,9 +2,9 @@ package request
 
 import (
 	"context"
-	proto "github.com/esklo/residents-tracking-platform/gen/proto/request"
-	"github.com/esklo/residents-tracking-platform/internal/model"
-	"github.com/esklo/residents-tracking-platform/internal/service"
+	proto "github.com/esklo/residents-tracking-platform-backend/gen/proto/request"
+	"github.com/esklo/residents-tracking-platform-backend/internal/model"
+	"github.com/esklo/residents-tracking-platform-backend/internal/service"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )

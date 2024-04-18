@@ -2,8 +2,8 @@ package user
 
 import (
 	"context"
-	proto "github.com/esklo/residents-tracking-platform/gen/proto/user"
-	"github.com/esklo/residents-tracking-platform/internal/model"
+	proto "github.com/esklo/residents-tracking-platform-backend/gen/proto/user"
+	"github.com/esklo/residents-tracking-platform-backend/internal/model"
 )
 
 func (i *Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*proto.User, error) {

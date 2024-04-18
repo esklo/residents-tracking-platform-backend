@@ -1,9 +1,9 @@
 package model
 
 import (
-	proto "github.com/esklo/residents-tracking-platform/gen/proto/file"
-	"github.com/esklo/residents-tracking-platform/gen/proto/geo"
-	protoRequest "github.com/esklo/residents-tracking-platform/gen/proto/request"
+	proto "github.com/esklo/residents-tracking-platform-backend/gen/proto/file"
+	"github.com/esklo/residents-tracking-platform-backend/gen/proto/geo"
+	protoRequest "github.com/esklo/residents-tracking-platform-backend/gen/proto/request"
 	"github.com/google/uuid"
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/geojson"

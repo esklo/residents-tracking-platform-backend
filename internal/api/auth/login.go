@@ -2,7 +2,7 @@ package auth
 
 import (
 	"context"
-	proto "github.com/esklo/residents-tracking-platform/gen/proto/auth"
+	proto "github.com/esklo/residents-tracking-platform-backend/gen/proto/auth"
 )
 
 func (i Implementation) Login(ctx context.Context, req *proto.LoginRequest) (*proto.LoginResponse, error) {

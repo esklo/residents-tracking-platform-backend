@@ -8,7 +8,7 @@ package department
 
 import (
 	context "context"
-	empty "github.com/esklo/residents-tracking-platform/gen/proto/empty"
+	empty "github.com/esklo/residents-tracking-platform-backend/gen/proto/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"

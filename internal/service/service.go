@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"github.com/ekomobile/dadata/v2/api/suggest"
-	"github.com/esklo/residents-tracking-platform/internal/model"
+	"github.com/esklo/residents-tracking-platform-backend/internal/model"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/google/uuid"
 )

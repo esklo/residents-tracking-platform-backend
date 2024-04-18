@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package department;
 
-option go_package = "github.com/esklo/residents-tracking-platform/gen/proto/department";
+option go_package = "github.com/esklo/residents-tracking-platform-backend/gen/proto/department";
 
 import "empty/empty.proto";
 

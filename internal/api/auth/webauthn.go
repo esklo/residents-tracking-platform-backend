@@ -3,9 +3,9 @@ package auth
 import (
 	"context"
 	"encoding/json"
-	proto "github.com/esklo/residents-tracking-platform/gen/proto/auth"
-	"github.com/esklo/residents-tracking-platform/gen/proto/empty"
-	"github.com/esklo/residents-tracking-platform/internal/model"
+	proto "github.com/esklo/residents-tracking-platform-backend/gen/proto/auth"
+	"github.com/esklo/residents-tracking-platform-backend/gen/proto/empty"
+	"github.com/esklo/residents-tracking-platform-backend/internal/model"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/pkg/errors"
 )

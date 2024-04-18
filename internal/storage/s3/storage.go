@@ -7,7 +7,7 @@ import (
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	def "github.com/esklo/residents-tracking-platform/internal/storage"
+	def "github.com/esklo/residents-tracking-platform-backend/internal/storage"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"

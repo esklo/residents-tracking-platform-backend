@@ -1,11 +1,11 @@
 package provider
 
 import (
-	"github.com/esklo/residents-tracking-platform/internal/api/auth"
-	"github.com/esklo/residents-tracking-platform/internal/repository"
-	webauthn2 "github.com/esklo/residents-tracking-platform/internal/repository/webauthn"
-	"github.com/esklo/residents-tracking-platform/internal/service"
-	authService "github.com/esklo/residents-tracking-platform/internal/service/auth"
+	"github.com/esklo/residents-tracking-platform-backend/internal/api/auth"
+	"github.com/esklo/residents-tracking-platform-backend/internal/repository"
+	webauthn2 "github.com/esklo/residents-tracking-platform-backend/internal/repository/webauthn"
+	"github.com/esklo/residents-tracking-platform-backend/internal/service"
+	authService "github.com/esklo/residents-tracking-platform-backend/internal/service/auth"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"log"
 	"time"

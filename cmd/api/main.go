@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/esklo/residents-tracking-platform/internal/app"
+	"github.com/esklo/residents-tracking-platform-backend/internal/app"
 	"log"
 )
 

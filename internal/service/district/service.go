@@ -3,9 +3,9 @@ package district
 import (
 	"context"
 	"fmt"
-	"github.com/esklo/residents-tracking-platform/internal/model"
-	"github.com/esklo/residents-tracking-platform/internal/repository"
-	def "github.com/esklo/residents-tracking-platform/internal/service"
+	"github.com/esklo/residents-tracking-platform-backend/internal/model"
+	"github.com/esklo/residents-tracking-platform-backend/internal/repository"
+	def "github.com/esklo/residents-tracking-platform-backend/internal/service"
 	"github.com/google/uuid"
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/geojson"

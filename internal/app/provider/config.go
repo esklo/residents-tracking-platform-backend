@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"github.com/esklo/residents-tracking-platform/internal/config"
+	"github.com/esklo/residents-tracking-platform-backend/internal/config"
 	"log"
 )
 

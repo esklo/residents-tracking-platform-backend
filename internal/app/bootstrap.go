@@ -3,7 +3,7 @@ package app
 import (
 	"context"
 	"database/sql"
-	"github.com/esklo/residents-tracking-platform/internal/model"
+	"github.com/esklo/residents-tracking-platform-backend/internal/model"
 	"github.com/pkg/errors"
 )
 

@@ -1,7 +1,7 @@
 package model
 
 import (
-	protoTheme "github.com/esklo/residents-tracking-platform/gen/proto/theme"
+	protoTheme "github.com/esklo/residents-tracking-platform-backend/gen/proto/theme"
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"

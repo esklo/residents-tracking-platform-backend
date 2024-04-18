@@ -1,8 +1,8 @@
 package user
 
 import (
-	proto "github.com/esklo/residents-tracking-platform/gen/proto/user"
-	"github.com/esklo/residents-tracking-platform/internal/service"
+	proto "github.com/esklo/residents-tracking-platform-backend/gen/proto/user"
+	"github.com/esklo/residents-tracking-platform-backend/internal/service"
 )
 
 type Implementation struct {

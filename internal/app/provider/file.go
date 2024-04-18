@@ -1,12 +1,12 @@
 package provider
 
 import (
-	"github.com/esklo/residents-tracking-platform/internal/api/file"
-	"github.com/esklo/residents-tracking-platform/internal/repository"
-	fileRepository "github.com/esklo/residents-tracking-platform/internal/repository/file"
-	"github.com/esklo/residents-tracking-platform/internal/service"
-	fileService "github.com/esklo/residents-tracking-platform/internal/service/file"
-	"github.com/esklo/residents-tracking-platform/internal/storage/s3"
+	"github.com/esklo/residents-tracking-platform-backend/internal/api/file"
+	"github.com/esklo/residents-tracking-platform-backend/internal/repository"
+	fileRepository "github.com/esklo/residents-tracking-platform-backend/internal/repository/file"
+	"github.com/esklo/residents-tracking-platform-backend/internal/service"
+	fileService "github.com/esklo/residents-tracking-platform-backend/internal/service/file"
+	"github.com/esklo/residents-tracking-platform-backend/internal/storage/s3"
 )
 
 func (s *ServiceProvider) FileRepository() repository.FileRepository {

@@ -1,9 +1,9 @@
 package provider
 
 import (
-	"github.com/esklo/residents-tracking-platform/internal/api/geo"
-	"github.com/esklo/residents-tracking-platform/internal/service"
-	geoService "github.com/esklo/residents-tracking-platform/internal/service/geo"
+	"github.com/esklo/residents-tracking-platform-backend/internal/api/geo"
+	"github.com/esklo/residents-tracking-platform-backend/internal/service"
+	geoService "github.com/esklo/residents-tracking-platform-backend/internal/service/geo"
 )
 
 func (s *ServiceProvider) GeoService() service.GeoService {

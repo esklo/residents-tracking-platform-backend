@@ -2,7 +2,7 @@ package auth
 
 import (
 	"context"
-	"github.com/esklo/residents-tracking-platform/internal/model"
+	"github.com/esklo/residents-tracking-platform-backend/internal/model"
 	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc/metadata"
 	"strings"

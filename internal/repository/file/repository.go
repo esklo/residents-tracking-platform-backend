@@ -3,8 +3,8 @@ package file
 import (
 	"context"
 	"database/sql"
-	"github.com/esklo/residents-tracking-platform/internal/model"
-	def "github.com/esklo/residents-tracking-platform/internal/repository"
+	"github.com/esklo/residents-tracking-platform-backend/internal/model"
+	def "github.com/esklo/residents-tracking-platform-backend/internal/repository"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )

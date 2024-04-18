@@ -3,7 +3,7 @@ package model
 import (
 	"crypto/rand"
 	"encoding/hex"
-	protoUser "github.com/esklo/residents-tracking-platform/gen/proto/user"
+	protoUser "github.com/esklo/residents-tracking-platform-backend/gen/proto/user"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"

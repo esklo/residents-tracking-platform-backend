@@ -1,11 +1,11 @@
 package provider
 
 import (
-	"github.com/esklo/residents-tracking-platform/internal/api/theme"
-	"github.com/esklo/residents-tracking-platform/internal/repository"
-	themeRepository "github.com/esklo/residents-tracking-platform/internal/repository/theme"
-	"github.com/esklo/residents-tracking-platform/internal/service"
-	themeService "github.com/esklo/residents-tracking-platform/internal/service/theme"
+	"github.com/esklo/residents-tracking-platform-backend/internal/api/theme"
+	"github.com/esklo/residents-tracking-platform-backend/internal/repository"
+	themeRepository "github.com/esklo/residents-tracking-platform-backend/internal/repository/theme"
+	"github.com/esklo/residents-tracking-platform-backend/internal/service"
+	themeService "github.com/esklo/residents-tracking-platform-backend/internal/service/theme"
 )
 
 func (s *ServiceProvider) ThemeRepository() repository.ThemeRepository {

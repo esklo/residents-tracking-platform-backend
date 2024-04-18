@@ -2,7 +2,7 @@ package user
 
 import (
 	"context"
-	"github.com/esklo/residents-tracking-platform/internal/model"
+	"github.com/esklo/residents-tracking-platform-backend/internal/model"
 )
 
 func (s *Service) Update(ctx context.Context, user *model.User) error {

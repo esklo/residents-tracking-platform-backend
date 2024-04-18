@@ -1,11 +1,11 @@
 package provider
 
 import (
-	"github.com/esklo/residents-tracking-platform/internal/api/department"
-	"github.com/esklo/residents-tracking-platform/internal/repository"
-	departmentRepository "github.com/esklo/residents-tracking-platform/internal/repository/department"
-	"github.com/esklo/residents-tracking-platform/internal/service"
-	departmentService "github.com/esklo/residents-tracking-platform/internal/service/department"
+	"github.com/esklo/residents-tracking-platform-backend/internal/api/department"
+	"github.com/esklo/residents-tracking-platform-backend/internal/repository"
+	departmentRepository "github.com/esklo/residents-tracking-platform-backend/internal/repository/department"
+	"github.com/esklo/residents-tracking-platform-backend/internal/service"
+	departmentService "github.com/esklo/residents-tracking-platform-backend/internal/service/department"
 )
 
 func (s *ServiceProvider) DepartmentRepository() repository.DepartmentRepository {

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package district;
 
-option go_package = "github.com/esklo/residents-tracking-platform/gen/proto/district";
+option go_package = "github.com/esklo/residents-tracking-platform-backend/gen/proto/district";
 
 import "empty/empty.proto";
 
