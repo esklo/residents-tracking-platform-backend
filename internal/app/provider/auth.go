@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"fmt"
 	"github.com/esklo/residents-tracking-platform-backend/internal/api/auth"
 	"github.com/esklo/residents-tracking-platform-backend/internal/repository"
 	webauthn2 "github.com/esklo/residents-tracking-platform-backend/internal/repository/webauthn"
@@ -36,9 +37,9 @@ func (s *ServiceProvider) WebAuthn() *webauthn.WebAuthn {
 	if s.webauthn == nil {
 		authn, err := webauthn.New(&webauthn.Config{
 			Debug:         true,
-			RPID:          "localhost",
+			RPID:          s.AppConfig().Domain(),
 			RPDisplayName: "Система обращений",
-			RPOrigins:     []string{"http://localhost"},
+			RPOrigins:     []string{fmt.Sprintf("%s://%s", s.AppConfig().Protocol(), s.AppConfig().Domain())},
 			Timeouts: webauthn.TimeoutsConfig{
 				Login: webauthn.TimeoutConfig{
 					Enforce: true,
