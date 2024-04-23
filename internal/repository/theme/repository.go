@@ -92,9 +92,9 @@ func (r *Repository) GetAll(ctx context.Context, onlyDeleted bool) ([]*model.The
 }
 
 func (r *Repository) GetAllWithDepartmentIds(ctx context.Context, departmentIds []string, onlyDeleted bool) ([]*model.Theme, error) {
-	deletedText := ""
+	deletedText := "is"
 	if onlyDeleted {
-		deletedText = "not"
+		deletedText = "is not"
 	}
 
 	connection, err := r.getConnection()
@@ -102,9 +102,10 @@ func (r *Repository) GetAllWithDepartmentIds(ctx context.Context, departmentIds 
 		return nil, errors.Wrap(err, "can not get database connection")
 	}
 	rows, err := connection.Query(
-		fmt.Sprintf("select id, title, priority, department_id, deleted_at from themes where department_id in (%s) and deleted_at is %s null order by id",
-			fmt.Sprintf("'%s'", strings.Join(departmentIds, "','"))),
-		deletedText,
+		fmt.Sprintf("select id, title, priority, department_id, deleted_at from themes where department_id in (%s) and deleted_at %s null order by id",
+			fmt.Sprintf("'%s'", strings.Join(departmentIds, "','")),
+			deletedText,
+		),
 	)
 	if err != nil {
 		return nil, err
