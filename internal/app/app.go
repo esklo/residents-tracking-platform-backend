@@ -23,6 +23,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
+	"log"
 	"net"
 	"net/http"
 )
@@ -75,7 +76,7 @@ func (a *App) initDeps(ctx context.Context) error {
 func (a *App) initConfig(_ context.Context) error {
 	err := config.Load(".env")
 	if err != nil {
-		a.serviceProvider.GetLogger().Warn(".env file error", zap.Error(err))
+		log.Printf(".env file error: %#v", err)
 	}
 
 	return nil
