@@ -8,6 +8,7 @@ import (
 	"github.com/esklo/residents-tracking-platform-backend/internal/service"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 type Implementation struct {
@@ -15,17 +16,20 @@ type Implementation struct {
 	themeService      service.ThemeService
 	departmentService service.DepartmentService
 	authService       service.AuthService
+	logger            *zap.Logger
 }
 
-func NewImplementation(themeService service.ThemeService, departmentService service.DepartmentService, authService service.AuthService) *Implementation {
+func NewImplementation(themeService service.ThemeService, departmentService service.DepartmentService, authService service.AuthService, logger *zap.Logger) *Implementation {
 	return &Implementation{
 		themeService:      themeService,
 		departmentService: departmentService,
 		authService:       authService,
+		logger:            logger,
 	}
 }
 
 func (i Implementation) Create(ctx context.Context, req *proto.CreateRequest) (*proto.Theme, error) {
+	i.logger.Debug("theme.Create request")
 	user, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -66,6 +70,7 @@ func (i Implementation) Create(ctx context.Context, req *proto.CreateRequest) (*
 }
 
 func (i Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*proto.Theme, error) {
+	i.logger.Debug("theme.GetById request")
 	_, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -83,6 +88,7 @@ func (i Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*p
 }
 
 func (i Implementation) Get(ctx context.Context, _ *proto.GetRequest) (*proto.GetResponse, error) {
+	i.logger.Debug("theme.Get request")
 	user, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -118,6 +124,7 @@ func (i Implementation) Get(ctx context.Context, _ *proto.GetRequest) (*proto.Ge
 }
 
 func (i Implementation) Update(ctx context.Context, req *proto.Theme) (*proto.Theme, error) {
+	i.logger.Debug("theme.Update request")
 	themeId, err := uuid.Parse(req.Id)
 	if err != nil {
 		return nil, errors.Wrap(err, "can not parse theme id")
@@ -139,6 +146,7 @@ func (i Implementation) Update(ctx context.Context, req *proto.Theme) (*proto.Th
 }
 
 func (i Implementation) Delete(ctx context.Context, req *proto.ByIdRequest) (*empty.Empty, error) {
+	i.logger.Debug("theme.Delete request")
 	themeId, err := uuid.Parse(req.Id)
 	if err != nil {
 		return nil, errors.Wrap(err, "can not parse theme id")

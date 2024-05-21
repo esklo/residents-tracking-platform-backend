@@ -6,19 +6,23 @@ import (
 	"github.com/esklo/residents-tracking-platform-backend/internal/repository"
 	def "github.com/esklo/residents-tracking-platform-backend/internal/service"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 )
 
 var _ def.ContactService = (*Service)(nil)
 
 type Service struct {
 	contactRepository repository.ContactRepository
+	logger            *zap.Logger
 }
 
 func NewService(
 	contactRepository repository.ContactRepository,
+	logger *zap.Logger,
 ) *Service {
 	return &Service{
 		contactRepository: contactRepository,
+		logger:            logger,
 	}
 }
 

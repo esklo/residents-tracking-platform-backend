@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 	"github.com/esklo/residents-tracking-platform-backend/internal/model"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (s *Service) Create(ctx context.Context, user *model.User) (*model.User, error) {
@@ -13,7 +13,7 @@ func (s *Service) Create(ctx context.Context, user *model.User) (*model.User, er
 	}
 	user, err = s.userRepository.Create(ctx, user)
 	if err != nil {
-		log.Printf("ошибка создания пользователя: %v\n", err)
+		s.logger.Error("user creation error", zap.Error(err))
 		return nil, err
 	}
 

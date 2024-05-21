@@ -7,6 +7,7 @@ import (
 )
 
 func (i *Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*proto.User, error) {
+	i.logger.Debug("user.GetById request")
 	_, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated

@@ -9,6 +9,7 @@ import (
 )
 
 func (i *Implementation) Get(ctx context.Context, req *proto.GetRequest) (*proto.GetResponse, error) {
+	i.logger.Debug("user.Get request")
 	user, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated

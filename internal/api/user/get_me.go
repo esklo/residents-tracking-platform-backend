@@ -8,6 +8,7 @@ import (
 )
 
 func (i *Implementation) GetMe(ctx context.Context, _ *protoEmpty.Empty) (*protoUser.User, error) {
+	i.logger.Debug("user.GetMe request")
 	user, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated

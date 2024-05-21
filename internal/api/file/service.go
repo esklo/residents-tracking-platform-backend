@@ -8,22 +8,26 @@ import (
 	"github.com/esklo/residents-tracking-platform-backend/internal/service"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 type Implementation struct {
 	proto.UnimplementedFileServiceServer
 	fileService service.FileService
 	authService service.AuthService
+	logger      *zap.Logger
 }
 
-func NewImplementation(fileService service.FileService, authService service.AuthService) *Implementation {
+func NewImplementation(fileService service.FileService, authService service.AuthService, logger *zap.Logger) *Implementation {
 	return &Implementation{
 		fileService: fileService,
 		authService: authService,
+		logger:      logger,
 	}
 }
 
 func (i Implementation) Upload(ctx context.Context, req *proto.UploadRequest) (*proto.File, error) {
+	i.logger.Debug("file.Upload request")
 	_, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -41,6 +45,7 @@ func (i Implementation) Upload(ctx context.Context, req *proto.UploadRequest) (*
 }
 
 func (i Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*proto.File, error) {
+	i.logger.Debug("file.GetById request")
 	_, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -62,6 +67,7 @@ func (i Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*p
 }
 
 func (i Implementation) Delete(ctx context.Context, req *proto.ByIdRequest) (*empty.Empty, error) {
+	i.logger.Debug("file.Delete request")
 	_, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated

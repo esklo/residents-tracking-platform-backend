@@ -17,6 +17,7 @@ import (
 	"github.com/esklo/residents-tracking-platform-backend/internal/service"
 	"github.com/esklo/residents-tracking-platform-backend/internal/storage/s3"
 	"github.com/go-webauthn/webauthn/webauthn"
+	"go.uber.org/zap"
 )
 
 type ServiceProvider struct {
@@ -61,6 +62,7 @@ type ServiceProvider struct {
 
 	fileStorage  *s3.Storage
 	dadataClient *suggest.Api
+	logger       *zap.Logger
 }
 
 func NewServiceProvider() *ServiceProvider {

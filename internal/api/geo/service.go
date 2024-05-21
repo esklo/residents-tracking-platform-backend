@@ -6,6 +6,7 @@ import (
 	proto "github.com/esklo/residents-tracking-platform-backend/gen/proto/geo"
 	"github.com/esklo/residents-tracking-platform-backend/internal/model"
 	"github.com/esklo/residents-tracking-platform-backend/internal/service"
+	"go.uber.org/zap"
 	"strconv"
 )
 
@@ -13,16 +14,19 @@ type Implementation struct {
 	proto.UnimplementedGeoServiceServer
 	geoService  service.GeoService
 	authService service.AuthService
+	logger      *zap.Logger
 }
 
-func NewImplementation(geoService service.GeoService, authService service.AuthService) *Implementation {
+func NewImplementation(geoService service.GeoService, authService service.AuthService, logger *zap.Logger) *Implementation {
 	return &Implementation{
 		geoService:  geoService,
 		authService: authService,
+		logger:      logger,
 	}
 }
 
 func (i Implementation) BuildingsByCoordinates(ctx context.Context, req *proto.GeoPoint) (*proto.BuildingByCoordinatesResponse, error) {
+	i.logger.Debug("geo.BuildingsByCoordinates request")
 	_, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -54,6 +58,7 @@ func (i Implementation) BuildingsByCoordinates(ctx context.Context, req *proto.G
 }
 
 func (i Implementation) GetAdministrativeDistricts(ctx context.Context, _ *empty.Empty) (*proto.GetDistrictsResponse, error) {
+	i.logger.Debug("geo.GetAdministrativeDistricts request")
 	_, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -76,6 +81,7 @@ func (i Implementation) GetAdministrativeDistricts(ctx context.Context, _ *empty
 }
 
 func (i Implementation) GetDistricts(ctx context.Context, req *proto.GetDistrictsRequest) (*proto.GetDistrictsResponse, error) {
+	i.logger.Debug("geo.GetDistricts request")
 	_, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -97,6 +103,7 @@ func (i Implementation) GetDistricts(ctx context.Context, req *proto.GetDistrict
 }
 
 func (i Implementation) Suggest(ctx context.Context, req *proto.SuggestRequest) (*proto.SuggestResponse, error) {
+	i.logger.Debug("geo.Suggest request")
 	suggestions, err := i.geoService.Suggest(ctx, req.Query)
 	if err != nil {
 		return nil, err
@@ -125,6 +132,7 @@ func (i Implementation) Suggest(ctx context.Context, req *proto.SuggestRequest) 
 }
 
 func (i Implementation) GeoLocate(ctx context.Context, req *proto.GeoPoint) (*proto.GeoLocateResponse, error) {
+	i.logger.Debug("geo.GeoLocate request")
 	suggestion, err := i.geoService.Locate(ctx, float64(req.Latitude), float64(req.Longitude))
 	if err != nil {
 		return nil, err

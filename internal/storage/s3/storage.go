@@ -11,8 +11,8 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -23,10 +23,18 @@ var _ def.Storage = (*Storage)(nil)
 type Storage struct {
 	endpoint, region, keyId, accessKey, bucket string
 	client                                     *s3.Client
+	logger                                     *zap.Logger
 }
 
-func NewStorage(endpoint, region, keyId, accessKey, bucket string) *Storage {
-	log.Println("storage init", endpoint, region, keyId, accessKey, bucket)
+func NewStorage(endpoint, region, keyId, accessKey, bucket string, logger *zap.Logger) *Storage {
+	logger.Info(
+		"storage init",
+		zap.String("endpoint", endpoint),
+		zap.String("region", region),
+		zap.String("keyId", keyId),
+		zap.String("accessKey", accessKey),
+		zap.String("bucket", bucket),
+	)
 	customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 		return aws.Endpoint{
 			URL:           endpoint,
@@ -40,7 +48,7 @@ func NewStorage(endpoint, region, keyId, accessKey, bucket string) *Storage {
 		awsConfig.WithEndpointResolverWithOptions(customResolver),
 	)
 	if err != nil {
-		log.Fatalf("can not create new file repository: %s", err)
+		logger.Fatal("can not create new file repository", zap.Error(err))
 	}
 
 	return &Storage{
@@ -50,6 +58,7 @@ func NewStorage(endpoint, region, keyId, accessKey, bucket string) *Storage {
 		accessKey: accessKey,
 		bucket:    bucket,
 		client:    s3.NewFromConfig(cfg),
+		logger:    logger,
 	}
 }
 
@@ -59,11 +68,11 @@ func (s Storage) PutFile(r io.ReadSeeker) (path string, mime *mimetype.MIME, err
 	}
 
 	path = fmt.Sprintf("storage/%s%s", uuid.New().String(), mime.Extension())
-	log.Printf("path: %#v", path)
+	s.logger.Info("put file path", zap.String("path", path))
 	if _, err = r.Seek(0, io.SeekStart); err != nil {
 		return
 	}
-	log.Printf("s.b: %#v", s.bucket)
+	s.logger.Info("put file bucket", zap.String("bucket", s.bucket))
 	_, err = s.client.PutObject(context.Background(), &s3.PutObjectInput{
 		Bucket:      aws.String(s.bucket),
 		Key:         aws.String(path),

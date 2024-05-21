@@ -21,6 +21,7 @@ func (s *ServiceProvider) ThemeService() service.ThemeService {
 		s.themeService = themeService.NewService(
 			s.ThemeRepository(),
 			s.DepartmentService(),
+			s.GetLogger(),
 		)
 	}
 
@@ -29,7 +30,7 @@ func (s *ServiceProvider) ThemeService() service.ThemeService {
 
 func (s *ServiceProvider) ThemeImpl() *theme.Implementation {
 	if s.themeImpl == nil {
-		s.themeImpl = theme.NewImplementation(s.ThemeService(), s.DepartmentService(), s.AuthService())
+		s.themeImpl = theme.NewImplementation(s.ThemeService(), s.DepartmentService(), s.AuthService(), s.GetLogger())
 	}
 
 	return s.themeImpl

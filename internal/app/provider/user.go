@@ -23,6 +23,7 @@ func (s *ServiceProvider) UserService() service.UserService {
 		s.userService = userService.NewService(
 			s.UserRepository(),
 			s.DepartmentService(),
+			s.GetLogger(),
 		)
 	}
 
@@ -31,7 +32,7 @@ func (s *ServiceProvider) UserService() service.UserService {
 
 func (s *ServiceProvider) UserImpl() *user.Implementation {
 	if s.userImpl == nil {
-		s.userImpl = user.NewImplementation(s.UserService(), s.AuthService(), s.DepartmentService())
+		s.userImpl = user.NewImplementation(s.UserService(), s.AuthService(), s.DepartmentService(), s.GetLogger())
 	}
 
 	return s.userImpl

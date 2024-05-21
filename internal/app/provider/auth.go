@@ -8,7 +8,7 @@ import (
 	"github.com/esklo/residents-tracking-platform-backend/internal/service"
 	authService "github.com/esklo/residents-tracking-platform-backend/internal/service/auth"
 	"github.com/go-webauthn/webauthn/webauthn"
-	"log"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -19,6 +19,7 @@ func (s *ServiceProvider) AuthService() service.AuthService {
 			s.AppConfig(),
 			s.WebAuthn(),
 			s.WebAuthnRepository(),
+			s.GetLogger(),
 		)
 	}
 
@@ -27,7 +28,7 @@ func (s *ServiceProvider) AuthService() service.AuthService {
 
 func (s *ServiceProvider) AuthImpl() *auth.Implementation {
 	if s.authImpl == nil {
-		s.authImpl = auth.NewImplementation(s.AuthService())
+		s.authImpl = auth.NewImplementation(s.AuthService(), s.GetLogger())
 	}
 
 	return s.authImpl
@@ -52,7 +53,7 @@ func (s *ServiceProvider) WebAuthn() *webauthn.WebAuthn {
 			},
 		})
 		if err != nil {
-			log.Fatalf("can not create webauthn: %s", err)
+			s.GetLogger().Fatal("can not create webauthn", zap.Error(err))
 		}
 		s.webauthn = authn
 	}

@@ -24,6 +24,7 @@ func (s *ServiceProvider) FileService() service.FileService {
 		s.fileService = fileService.NewService(
 			s.FileRepository(),
 			s.FileStorage(),
+			s.GetLogger(),
 		)
 	}
 
@@ -32,7 +33,7 @@ func (s *ServiceProvider) FileService() service.FileService {
 
 func (s *ServiceProvider) FileImpl() *file.Implementation {
 	if s.fileImpl == nil {
-		s.fileImpl = file.NewImplementation(s.FileService(), s.AuthService())
+		s.fileImpl = file.NewImplementation(s.FileService(), s.AuthService(), s.GetLogger())
 	}
 
 	return s.fileImpl
@@ -41,7 +42,7 @@ func (s *ServiceProvider) FileImpl() *file.Implementation {
 func (s *ServiceProvider) FileStorage() *s3.Storage {
 	if s.fileStorage == nil {
 		cfg := s.S3Config()
-		s.fileStorage = s3.NewStorage(cfg.Endpoint(), cfg.Region(), cfg.KeyId(), cfg.AccessKey(), cfg.Bucket())
+		s.fileStorage = s3.NewStorage(cfg.Endpoint(), cfg.Region(), cfg.KeyId(), cfg.AccessKey(), cfg.Bucket(), s.GetLogger())
 	}
 
 	return s.fileStorage

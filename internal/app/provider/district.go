@@ -23,6 +23,7 @@ func (s *ServiceProvider) DistrictService() service.DistrictService {
 		s.districtService = districtService.NewService(
 			s.DistrictRepository(),
 			s.FileRepository(),
+			s.GetLogger(),
 		)
 	}
 
@@ -31,7 +32,7 @@ func (s *ServiceProvider) DistrictService() service.DistrictService {
 
 func (s *ServiceProvider) DistrictImpl() *district.Implementation {
 	if s.districtImpl == nil {
-		s.districtImpl = district.NewImplementation(s.DistrictService(), s.AuthService())
+		s.districtImpl = district.NewImplementation(s.DistrictService(), s.AuthService(), s.GetLogger())
 	}
 
 	return s.districtImpl

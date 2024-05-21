@@ -19,10 +19,10 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/pkg/errors"
 	"github.com/rs/cors"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
-	"log"
 	"net"
 	"net/http"
 )
@@ -47,7 +47,7 @@ func (a *App) Run() error {
 	go func() {
 		err := a.runHTTPServer()
 		if err != nil {
-			log.Fatal(errors.Wrap(err, "http server error"))
+			a.serviceProvider.GetLogger().Fatal("http server error", zap.Error(err))
 		}
 	}()
 	return a.runGRPCServer()
@@ -75,7 +75,7 @@ func (a *App) initDeps(ctx context.Context) error {
 func (a *App) initConfig(_ context.Context) error {
 	err := config.Load(".env")
 	if err != nil {
-		log.Printf(".env file error: %s", err)
+		a.serviceProvider.GetLogger().Warn(".env file error", zap.Error(err))
 	}
 
 	return nil
@@ -86,12 +86,45 @@ func (a *App) initServiceProvider(_ context.Context) error {
 	return nil
 }
 
+func loggingInterceptor(logger *zap.Logger) grpc.UnaryServerInterceptor {
+	return func(
+		ctx context.Context,
+		req interface{},
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (resp interface{}, err error) {
+		logger.Info("Request received",
+			zap.String("method", info.FullMethod),
+			zap.Any("request", req),
+		)
+
+		resp, err = handler(ctx, req)
+
+		if err != nil {
+			logger.Error("Request failed",
+				zap.String("method", info.FullMethod),
+				zap.Error(err),
+			)
+		} else {
+			logger.Info("Request succeeded",
+				zap.String("method", info.FullMethod),
+			)
+		}
+
+		return resp, err
+	}
+}
+
 func (a *App) initGRPCServer(_ context.Context) error {
 	a.grpcServer = grpc.NewServer(
 		grpc.MaxRecvMsgSize(50*1024*1024),
 		grpc.MaxSendMsgSize(50*1024*1024),
+		grpc.ChainUnaryInterceptor(loggingInterceptor(a.serviceProvider.GetLogger())),
 	)
-	reflection.Register(a.grpcServer)
+	if a.serviceProvider.AppConfig().Env() == "local" {
+		reflection.Register(a.grpcServer)
+	}
+
 	protoUser.RegisterUserServiceServer(a.grpcServer, a.serviceProvider.UserImpl())
 	protoAuth.RegisterAuthServiceServer(a.grpcServer, a.serviceProvider.AuthImpl())
 	protoGeo.RegisterGeoServiceServer(a.grpcServer, a.serviceProvider.GeoImpl())
@@ -151,7 +184,7 @@ func (a *App) runHTTPServer() error {
 
 	withCors := cors.AllowAll().Handler(mux)
 
-	log.Printf("HTTP server is running on %s", a.serviceProvider.HTTPConfig().Address())
+	a.serviceProvider.GetLogger().Info("HTTP server is running", zap.String("address", a.serviceProvider.HTTPConfig().Address()))
 	if err := http.ListenAndServe(a.serviceProvider.HTTPConfig().Address(), withCors); err != nil {
 		return errors.Wrap(err, "failed to start HTTP server")
 	}
@@ -160,8 +193,7 @@ func (a *App) runHTTPServer() error {
 }
 
 func (a *App) runGRPCServer() error {
-	log.Printf("GRPC server is running on %s", a.serviceProvider.GRPCConfig().Address())
-
+	a.serviceProvider.GetLogger().Info("GRPC server is running", zap.String("address", a.serviceProvider.GRPCConfig().Address()))
 	list, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().Address())
 	if err != nil {
 		return err

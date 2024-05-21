@@ -2,14 +2,14 @@ package provider
 
 import (
 	"github.com/esklo/residents-tracking-platform-backend/internal/config"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (s *ServiceProvider) AppConfig() config.AppConfig {
 	if s.appConfig == nil {
 		cfg, err := config.NewAppConfig()
 		if err != nil {
-			log.Fatalf("failed to get app config: %s", err.Error())
+			s.GetLogger().Error("failed to get app config", zap.Error(err))
 		}
 
 		s.appConfig = cfg
@@ -22,7 +22,7 @@ func (s *ServiceProvider) GRPCConfig() config.GRPCConfig {
 	if s.grpcConfig == nil {
 		cfg, err := config.NewGRPCConfig()
 		if err != nil {
-			log.Fatalf("failed to get grpc config: %s", err.Error())
+			s.GetLogger().Error("failed to get grpc config", zap.Error(err))
 		}
 
 		s.grpcConfig = cfg
@@ -35,7 +35,7 @@ func (s *ServiceProvider) HTTPConfig() config.HTTPConfig {
 	if s.httpConfig == nil {
 		cfg, err := config.NewHTTPConfig()
 		if err != nil {
-			log.Fatalf("failed to get http config: %s", err.Error())
+			s.GetLogger().Error("failed to get http config", zap.Error(err))
 		}
 
 		s.httpConfig = cfg
@@ -48,7 +48,7 @@ func (s *ServiceProvider) DatabaseConfig() config.DatabaseConfig {
 	if s.databaseConfig == nil {
 		cfg, err := config.NewDatabaseConfig()
 		if err != nil {
-			log.Fatalf("failed to get database config: %s", err.Error())
+			s.GetLogger().Error("failed to get database config", zap.Error(err))
 		}
 
 		s.databaseConfig = cfg
@@ -61,7 +61,7 @@ func (s *ServiceProvider) S3Config() config.S3Config {
 	if s.s3Config == nil {
 		cfg, err := config.NewS3Config()
 		if err != nil {
-			log.Fatalf("failed to get s3 config: %s", err.Error())
+			s.GetLogger().Error("failed to get s3 config", zap.Error(err))
 		}
 
 		s.s3Config = cfg
@@ -74,7 +74,7 @@ func (s *ServiceProvider) DadataConfig() config.DadataConfig {
 	if s.dadataConfig == nil {
 		cfg, err := config.NewDadataConfig()
 		if err != nil {
-			log.Fatalf("failed to get dadata config: %s", err.Error())
+			s.GetLogger().Error("failed to get dadata config", zap.Error(err))
 		}
 
 		s.dadataConfig = cfg

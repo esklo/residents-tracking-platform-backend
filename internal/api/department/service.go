@@ -7,22 +7,26 @@ import (
 	"github.com/esklo/residents-tracking-platform-backend/internal/service"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 type Implementation struct {
 	proto.UnimplementedDepartmentServiceServer
 	departmentService service.DepartmentService
 	authService       service.AuthService
+	logger            *zap.Logger
 }
 
-func NewImplementation(departmentService service.DepartmentService, authService service.AuthService) *Implementation {
+func NewImplementation(departmentService service.DepartmentService, authService service.AuthService, logger *zap.Logger) *Implementation {
 	return &Implementation{
 		departmentService: departmentService,
 		authService:       authService,
+		logger:            logger,
 	}
 }
 
 func (i Implementation) Create(ctx context.Context, req *proto.CreateRequest) (*proto.Department, error) {
+	i.logger.Debug("department.Create request")
 	user, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -57,6 +61,7 @@ func (i Implementation) Create(ctx context.Context, req *proto.CreateRequest) (*
 }
 
 func (i Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*proto.Department, error) {
+	i.logger.Debug("department.GetById request")
 	_, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -74,6 +79,7 @@ func (i Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*p
 }
 
 func (i Implementation) Get(ctx context.Context, _ *proto.GetRequest) (*proto.GetResponse, error) {
+	i.logger.Debug("department.Get request")
 	user, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated

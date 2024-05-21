@@ -8,7 +8,7 @@ import (
 
 func (s *ServiceProvider) GeoService() service.GeoService {
 	if s.geoService == nil {
-		s.geoService = geoService.NewService(s.DadataClient())
+		s.geoService = geoService.NewService(s.DadataClient(), s.GetLogger())
 	}
 
 	return s.geoService
@@ -16,7 +16,7 @@ func (s *ServiceProvider) GeoService() service.GeoService {
 
 func (s *ServiceProvider) GeoImpl() *geo.Implementation {
 	if s.geoImpl == nil {
-		s.geoImpl = geo.NewImplementation(s.GeoService(), s.AuthService())
+		s.geoImpl = geo.NewImplementation(s.GeoService(), s.AuthService(), s.GetLogger())
 	}
 
 	return s.geoImpl

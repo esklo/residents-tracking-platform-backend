@@ -24,6 +24,7 @@ func (s *ServiceProvider) RequestService() service.RequestService {
 			s.RequestRepository(),
 			s.ContactService(),
 			s.FileService(),
+			s.GetLogger(),
 		)
 	}
 
@@ -32,7 +33,7 @@ func (s *ServiceProvider) RequestService() service.RequestService {
 
 func (s *ServiceProvider) RequestImpl() *request.Implementation {
 	if s.requestImpl == nil {
-		s.requestImpl = request.NewImplementation(s.RequestService(), s.AuthService())
+		s.requestImpl = request.NewImplementation(s.RequestService(), s.AuthService(), s.GetLogger())
 	}
 
 	return s.requestImpl

@@ -7,22 +7,26 @@ import (
 	"github.com/esklo/residents-tracking-platform-backend/internal/service"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 type Implementation struct {
 	proto.UnimplementedDistrictServiceServer
 	districtService service.DistrictService
 	authService     service.AuthService
+	logger          *zap.Logger
 }
 
-func NewImplementation(districtService service.DistrictService, authService service.AuthService) *Implementation {
+func NewImplementation(districtService service.DistrictService, authService service.AuthService, logger *zap.Logger) *Implementation {
 	return &Implementation{
 		districtService: districtService,
 		authService:     authService,
+		logger:          logger,
 	}
 }
 
 func (i Implementation) Get(ctx context.Context, _ *proto.GetRequest) (*proto.GetResponse, error) {
+	i.logger.Debug("district.Get request")
 	user, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -50,6 +54,7 @@ func (i Implementation) Get(ctx context.Context, _ *proto.GetRequest) (*proto.Ge
 }
 
 func (i Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*proto.District, error) {
+	i.logger.Debug("district.GetById request")
 	_, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -67,6 +72,7 @@ func (i Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*p
 }
 
 func (i Implementation) Create(ctx context.Context, req *proto.CreateRequest) (*proto.District, error) {
+	i.logger.Debug("district.Create request")
 	user, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated

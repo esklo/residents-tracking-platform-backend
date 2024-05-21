@@ -11,7 +11,6 @@ import (
 	"github.com/mileusna/useragent"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/metadata"
-	"log"
 )
 
 func (s *Service) RequestPublicKeyAttestation(ctx context.Context, user *model.User) ([]byte, []byte, error) {
@@ -146,7 +145,6 @@ func (s *Service) PublicKeyAssertion(ctx context.Context, flowId []byte, credent
 	if err != nil {
 		return nil, errors.Wrap(err, "can not validate discoverable login")
 	}
-	log.Printf("discoverableLogin: %#v", discoverableLogin)
 	if err := s.webAuthnRepository.UpdateUserCredential(ctx, user.Id.String(), user.WebAuthnID()[:], discoverableLogin); err != nil {
 		return nil, errors.Wrap(err, "can not update credential")
 	}

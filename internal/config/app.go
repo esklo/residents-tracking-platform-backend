@@ -11,6 +11,7 @@ const (
 	adminPasswordEnvName = "ADMIN_PASSWORD"
 	domainEnvName        = "INTERNAL_APP_DOMAIN"
 	protocolEnvName      = "INTERNAL_APP_PROTOCOL"
+	envEnvName           = "ENV"
 )
 
 type AppConfig interface {
@@ -19,6 +20,7 @@ type AppConfig interface {
 	AdminPassword() string
 	Domain() string
 	Protocol() string
+	Env() string
 }
 
 type appConfig struct {
@@ -27,6 +29,7 @@ type appConfig struct {
 	adminPassword string
 	domain        string
 	protocol      string
+	env           string
 }
 
 func NewAppConfig() (AppConfig, error) {
@@ -55,12 +58,18 @@ func NewAppConfig() (AppConfig, error) {
 		return nil, errors.New("protocol not found")
 	}
 
+	env := os.Getenv(envEnvName)
+	if len(env) == 0 {
+		return nil, errors.New("env not found")
+	}
+
 	return &appConfig{
 		jwtSecret:     jwtSecret,
 		adminEmail:    adminEmail,
 		adminPassword: adminPassword,
 		domain:        domain,
 		protocol:      protocol,
+		env:           env,
 	}, nil
 }
 
@@ -82,4 +91,8 @@ func (cfg *appConfig) Domain() string {
 
 func (cfg *appConfig) Protocol() string {
 	return cfg.protocol
+}
+
+func (cfg *appConfig) Env() string {
+	return cfg.env
 }

@@ -7,22 +7,26 @@ import (
 	"github.com/esklo/residents-tracking-platform-backend/internal/service"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 type Implementation struct {
 	proto.UnimplementedRequestServiceServer
 	requestService service.RequestService
 	authService    service.AuthService
+	logger         *zap.Logger
 }
 
-func NewImplementation(requestService service.RequestService, authService service.AuthService) *Implementation {
+func NewImplementation(requestService service.RequestService, authService service.AuthService, logger *zap.Logger) *Implementation {
 	return &Implementation{
 		requestService: requestService,
 		authService:    authService,
+		logger:         logger,
 	}
 }
 
 func (i Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*proto.Request, error) {
+	i.logger.Debug("request.GetById request")
 	_, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -40,6 +44,7 @@ func (i Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*p
 }
 
 func (i Implementation) Create(ctx context.Context, req *proto.CreateRequest) (*proto.Request, error) {
+	i.logger.Debug("request.Create request")
 	_, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -74,6 +79,7 @@ func (i Implementation) Create(ctx context.Context, req *proto.CreateRequest) (*
 }
 
 func (i Implementation) Get(ctx context.Context, req *proto.GetRequest) (*proto.GetResponse, error) {
+	i.logger.Debug("request.Get request")
 	requests, err := i.requestService.GetAll(ctx)
 	if err != nil {
 		return nil, err
@@ -90,10 +96,12 @@ func (i Implementation) Get(ctx context.Context, req *proto.GetRequest) (*proto.
 }
 
 func (i Implementation) Update(ctx context.Context, req *proto.Request) (*proto.Request, error) {
+	i.logger.Debug("request.Update request")
 	return nil, nil
 }
 
 func (i Implementation) GetAsGeoJson(ctx context.Context, req *proto.GetRequest) (*proto.GetAsGeoJsonResponse, error) {
+	i.logger.Debug("request.GetAsGeoJson request")
 	bytes, err := i.requestService.GetAllAsGeoJson(ctx)
 	return &proto.GetAsGeoJsonResponse{Geojson: bytes}, err
 }

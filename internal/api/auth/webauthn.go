@@ -11,6 +11,7 @@ import (
 )
 
 func (i Implementation) RequestPublicKeyAttestation(ctx context.Context, _ *empty.Empty) (*proto.PublicKeyCredentialsResponse, error) {
+	i.logger.Debug("auth.RequestPublicKeyAttestation request")
 	user, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -27,6 +28,7 @@ func (i Implementation) RequestPublicKeyAttestation(ctx context.Context, _ *empt
 }
 
 func (i Implementation) PublicKeyAttestation(ctx context.Context, req *proto.PublicKeyCredentialsRequest) (*empty.Empty, error) {
+	i.logger.Debug("auth.PublicKeyAttestation request")
 	user, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -44,6 +46,7 @@ func (i Implementation) PublicKeyAttestation(ctx context.Context, req *proto.Pub
 }
 
 func (i Implementation) RequestPublicKeyAssertion(ctx context.Context, _ *empty.Empty) (*proto.PublicKeyCredentialsResponse, error) {
+	i.logger.Debug("auth.RequestPublicKeyAssertion request")
 	flowId, credentials, err := i.authService.RequestPublicKeyAssertion(ctx)
 	if err != nil {
 		return nil, err
@@ -55,6 +58,7 @@ func (i Implementation) RequestPublicKeyAssertion(ctx context.Context, _ *empty.
 }
 
 func (i Implementation) PublicKeyAssertion(ctx context.Context, req *proto.PublicKeyCredentialsRequest) (*proto.LoginResponse, error) {
+	i.logger.Debug("auth.PublicKeyAssertion request")
 	var car protocol.CredentialAssertionResponse
 	if err := json.Unmarshal([]byte(req.Credentials), &car); err != nil {
 		return nil, errors.Wrap(err, "can not unmarshal credentials")
@@ -80,6 +84,7 @@ func (i Implementation) PublicKeyAssertion(ctx context.Context, req *proto.Publi
 }
 
 func (i Implementation) GetPublicKeys(ctx context.Context, req *empty.Empty) (*proto.GetPublicKeysResponse, error) {
+	i.logger.Debug("auth.GetPublicKeys request")
 	user, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated
@@ -102,6 +107,7 @@ func (i Implementation) GetPublicKeys(ctx context.Context, req *empty.Empty) (*p
 }
 
 func (i Implementation) DeletePublicKey(ctx context.Context, key *proto.Key) (*empty.Empty, error) {
+	i.logger.Debug("auth.DeletePublicKey request")
 	_, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated

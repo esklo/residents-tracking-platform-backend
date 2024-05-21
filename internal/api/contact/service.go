@@ -7,22 +7,26 @@ import (
 	"github.com/esklo/residents-tracking-platform-backend/internal/service"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 type Implementation struct {
 	proto.UnimplementedContactServiceServer
 	contactService service.ContactService
 	authService    service.AuthService
+	logger         *zap.Logger
 }
 
-func NewImplementation(contactService service.ContactService, authService service.AuthService) *Implementation {
+func NewImplementation(contactService service.ContactService, authService service.AuthService, logger *zap.Logger) *Implementation {
 	return &Implementation{
 		contactService: contactService,
 		authService:    authService,
+		logger:         logger,
 	}
 }
 
 func (i Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*proto.Contact, error) {
+	i.logger.Debug("contact.GetById request")
 	_, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated

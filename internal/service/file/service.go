@@ -9,6 +9,7 @@ import (
 	"github.com/esklo/residents-tracking-platform-backend/internal/storage"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 var _ def.FileService = (*Service)(nil)
@@ -16,15 +17,18 @@ var _ def.FileService = (*Service)(nil)
 type Service struct {
 	fileRepository repository.FileRepository
 	fileStorage    storage.Storage
+	logger         *zap.Logger
 }
 
 func NewService(
 	fileRepository repository.FileRepository,
 	fileStorage storage.Storage,
+	logger *zap.Logger,
 ) *Service {
 	return &Service{
 		fileRepository: fileRepository,
 		fileStorage:    fileStorage,
+		logger:         logger,
 	}
 }
 

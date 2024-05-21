@@ -4,17 +4,17 @@ import (
 	"context"
 	"github.com/esklo/residents-tracking-platform-backend/internal/model"
 	"github.com/google/uuid"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (s *Service) Get(ctx context.Context, id string) (*model.User, error) {
 	user, err := s.userRepository.GetByID(ctx, id)
 	if err != nil {
-		log.Printf("ошибка получения пользователя: %v\n", err)
+		s.logger.Error("user get error", zap.Error(err))
 		return nil, err
 	}
 	if user == nil {
-		log.Printf("пользователь с id %s не найден\n", id)
+		s.logger.Error("user with id not found", zap.String("id", id))
 		return nil, model.ErrorNotFound
 	}
 

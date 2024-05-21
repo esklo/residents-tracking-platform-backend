@@ -7,6 +7,7 @@ import (
 	def "github.com/esklo/residents-tracking-platform-backend/internal/service"
 	"github.com/google/uuid"
 	"github.com/paulmach/orb/geojson"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -16,17 +17,20 @@ type Service struct {
 	requestRepository repository.RequestRepository
 	contactService    def.ContactService
 	fileService       def.FileService
+	logger            *zap.Logger
 }
 
 func NewService(
 	requestRepository repository.RequestRepository,
 	contactService def.ContactService,
 	fileService def.FileService,
+	logger *zap.Logger,
 ) *Service {
 	return &Service{
 		requestRepository: requestRepository,
 		contactService:    contactService,
 		fileService:       fileService,
+		logger:            logger,
 	}
 }
 

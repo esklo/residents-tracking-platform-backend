@@ -9,6 +9,7 @@ import (
 )
 
 func (i Implementation) ChangePassword(ctx context.Context, req *proto.ChangePasswordRequest) (*empty.Empty, error) {
+	i.logger.Debug("auth.ChangePassword request")
 	user, err := i.authService.ExchangeTokenFromContext(ctx)
 	if err != nil {
 		return nil, model.ErrorUnauthenticated

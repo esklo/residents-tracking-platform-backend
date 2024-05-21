@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/esklo/residents-tracking-platform-backend/internal/model"
 	"github.com/serjvanilla/go-overpass"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (s *Service) GetDistricts(_ context.Context, areaId int64, level int) (districts []*model.GeoDistrict, err error) {
@@ -25,7 +25,7 @@ out geom;
 		var district model.GeoDistrict
 		district.Id = relation.ID
 		district.Name = relation.Tags["name"]
-		log.Printf("district: %#v", district)
+		s.logger.Info("processing district", zap.Any("district", district))
 		if district.Name == "" {
 			continue
 		}

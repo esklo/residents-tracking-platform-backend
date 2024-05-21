@@ -6,6 +6,7 @@ import (
 )
 
 func (i Implementation) Login(ctx context.Context, req *proto.LoginRequest) (*proto.LoginResponse, error) {
+	i.logger.Debug("auth.Login request")
 	user, err := i.authService.Login(ctx, req.Email, req.Password)
 	if err != nil {
 		return nil, err

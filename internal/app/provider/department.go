@@ -22,6 +22,7 @@ func (s *ServiceProvider) DepartmentService() service.DepartmentService {
 	if s.departmentService == nil {
 		s.departmentService = departmentService.NewService(
 			s.DepartmentRepository(),
+			s.GetLogger(),
 		)
 	}
 
@@ -30,7 +31,7 @@ func (s *ServiceProvider) DepartmentService() service.DepartmentService {
 
 func (s *ServiceProvider) DepartmentImpl() *department.Implementation {
 	if s.departmentImpl == nil {
-		s.departmentImpl = department.NewImplementation(s.DepartmentService(), s.AuthService())
+		s.departmentImpl = department.NewImplementation(s.DepartmentService(), s.AuthService(), s.GetLogger())
 	}
 
 	return s.departmentImpl

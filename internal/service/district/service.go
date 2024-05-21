@@ -11,7 +11,7 @@ import (
 	"github.com/paulmach/orb/geojson"
 	"github.com/pkg/errors"
 	"github.com/serjvanilla/go-overpass"
-	"log"
+	"go.uber.org/zap"
 	"slices"
 )
 
@@ -20,26 +20,29 @@ var _ def.DistrictService = (*Service)(nil)
 type Service struct {
 	districtRepository repository.DistrictRepository
 	fileRepository     repository.FileRepository
+	logger             *zap.Logger
 }
 
 func NewService(
 	districtRepository repository.DistrictRepository,
 	fileRepository repository.FileRepository,
+	logger *zap.Logger,
 ) *Service {
 	return &Service{
 		districtRepository: districtRepository,
 		fileRepository:     fileRepository,
+		logger:             logger,
 	}
 }
 
 func (s *Service) Get(ctx context.Context, id *uuid.UUID) (*model.District, error) {
 	district, err := s.districtRepository.GetByID(ctx, id.String())
 	if err != nil {
-		log.Printf("ошибка получения района: %v\n", err)
+		s.logger.Error("can not get district", zap.Error(err))
 		return nil, err
 	}
 	if district == nil {
-		log.Printf("район с id %s не найден\n", id)
+		s.logger.Error("district with id not found", zap.String("id", id.String()))
 		return nil, model.ErrorNotFound
 	}
 
@@ -79,12 +82,12 @@ func (s *Service) Create(ctx context.Context, areaId int64, fileId *uuid.UUID) (
 	currentMember := findNextMember(relation.Members, nil, proceededWays)
 	for currentMember != nil {
 		nodes := currentMember.Way.Nodes
-		log.Printf("w.id: %#v; %#v; %#v", currentMember.Way.ID, nodes[0].ID, nodes[len(nodes)-1].ID)
+		//log.Printf("w.id: %#v; %#v; %#v", currentMember.Way.ID, nodes[0].ID, nodes[len(nodes)-1].ID)
 		for i, node := range nodes {
 			point := orb.Point{node.Lon, node.Lat}
 			ring = append(ring, point)
 			if len(currentMember.Way.Nodes) == i+1 && ring[0].Equal(point) {
-				log.Printf("EQUAL!")
+				//log.Printf("EQUAL!")
 				if ring.Orientation() == orb.CCW {
 					ring.Reverse()
 				}
@@ -113,7 +116,7 @@ func (s *Service) Create(ctx context.Context, areaId int64, fileId *uuid.UUID) (
 		CoatOfArmsFileId: fileId,
 	})
 	if err != nil {
-		log.Printf("ошибка создания района: %v\n", err)
+		s.logger.Error("can not create district", zap.Error(err))
 		return nil, err
 	}
 
