@@ -9,6 +9,7 @@ type Department struct {
 	Id         uuid.UUID
 	Title      string
 	DistrictId uuid.UUID
+	FullAccess bool
 }
 
 func (d *Department) ToProto() (*protoDepartment.Department, error) {
@@ -19,6 +20,7 @@ func (d *Department) ToProto() (*protoDepartment.Department, error) {
 		Id:         d.Id.String(),
 		Title:      d.Title,
 		DistrictId: d.DistrictId.String(),
+		FullAccess: d.FullAccess,
 	}
 	return &department, nil
 }

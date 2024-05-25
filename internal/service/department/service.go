@@ -40,3 +40,7 @@ func (s *Service) GetAll(ctx context.Context, districtId *uuid.UUID) ([]*model.D
 	}
 	return s.departmentRepository.GetAllWithDistrictId(ctx, districtId.String())
 }
+
+func (s *Service) Update(ctx context.Context, department *model.Department) error {
+	return s.departmentRepository.Update(ctx, department)
+}

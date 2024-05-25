@@ -120,7 +120,7 @@ func (r *Repository) GetAll(ctx context.Context) ([]*model.User, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "can not get database connection")
 	}
-	rows, err := connection.Query("select id, email,first_name,last_name,father_name,department_id from users order by id")
+	rows, err := connection.Query("select id, email,first_name,last_name,father_name,department_id from users order by department_id,last_name,first_name,father_name")
 	if err != nil {
 		return nil, err
 	}

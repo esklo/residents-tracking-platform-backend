@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/twpayne/go-geom/encoding/ewkb"
+	"time"
 )
 
 var _ def.RequestRepository = (*Repository)(nil)
@@ -184,4 +185,40 @@ func (r *Repository) AddFile(ctx context.Context, requestId, fileId string) erro
 		return errors.Wrap(err, "can not execute create query")
 	}
 	return nil
+}
+
+func (r *Repository) GetCountWithThemeId(ctx context.Context, from time.Time, to time.Time, themeId string) (float64, error) {
+	connection, err := r.getConnection()
+	if err != nil {
+		return 0, errors.Wrap(err, "can not get database connection")
+	}
+
+	var count float64
+	err = connection.QueryRow(`select count(*) from requests where theme_id = $1 and created_at >= $2 and created_at < $3`, themeId, from, to).
+		Scan(
+			&count,
+		)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (r *Repository) GetCountWithThemeIdAndStatus(ctx context.Context, themeId string, status int) (float64, error) {
+	connection, err := r.getConnection()
+	if err != nil {
+		return 0, errors.Wrap(err, "can not get database connection")
+	}
+
+	var count float64
+	err = connection.QueryRow(`select count(*) from requests where theme_id = $1 and status = $2`, themeId, status).
+		Scan(
+			&count,
+		)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }

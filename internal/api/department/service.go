@@ -53,8 +53,31 @@ func (i Implementation) Create(ctx context.Context, req *proto.CreateRequest) (*
 	department, err := i.departmentService.Create(ctx, &model.Department{
 		Title:      req.Title,
 		DistrictId: districtId,
+		FullAccess: req.FullAccess,
 	})
 	if err != nil {
+		return nil, err
+	}
+	return department.ToProto()
+}
+
+func (i Implementation) Update(ctx context.Context, req *proto.Department) (*proto.Department, error) {
+	i.logger.Debug("department.Update request")
+	departmentId, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, errors.Wrap(err, "can not parse department id")
+	}
+	districtId, err := uuid.Parse(req.DistrictId)
+	if err != nil {
+		return nil, errors.Wrap(err, "can not parse district id")
+	}
+	department := model.Department{
+		Id:         departmentId,
+		Title:      req.Title,
+		DistrictId: districtId,
+		FullAccess: req.FullAccess,
+	}
+	if err := i.departmentService.Update(ctx, &department); err != nil {
 		return nil, err
 	}
 	return department.ToProto()

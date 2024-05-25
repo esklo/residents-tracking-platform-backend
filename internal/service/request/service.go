@@ -8,6 +8,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/paulmach/orb/geojson"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/metadata"
+	"strconv"
 	"time"
 )
 
@@ -35,6 +37,18 @@ func NewService(
 }
 
 func (s *Service) Create(ctx context.Context, themeId *uuid.UUID, description, address string, contact *model.Contact, geo model.GeoPoint, fileIds []*uuid.UUID) (*model.Request, error) {
+	var createdAt time.Time
+	createdAt = time.Now()
+	md, _ := metadata.FromIncomingContext(ctx)
+	createdAts := md.Get("created_at")
+	if len(createdAts) > 0 {
+		i, err := strconv.ParseInt(createdAts[0], 10, 64)
+		if err != nil {
+			panic(err)
+		}
+		createdAt = time.Unix(i, 0)
+	}
+
 	contactCreated, err := s.contactService.Create(ctx, contact)
 	if err != nil {
 		return nil, err
@@ -43,7 +57,7 @@ func (s *Service) Create(ctx context.Context, themeId *uuid.UUID, description, a
 		Description: description,
 		Geo:         geo,
 		Address:     address,
-		CreatedAt:   time.Now(),
+		CreatedAt:   createdAt,
 		Status:      model.RequestStatusOpen,
 		ThemeId:     themeId,
 		Contact:     contactCreated,
@@ -134,4 +148,11 @@ func (s *Service) GetAllAsGeoJson(ctx context.Context) ([]byte, error) {
 		collection.Append(feature)
 	}
 	return collection.MarshalJSON()
+}
+
+func (s *Service) GetCountWithThemeId(ctx context.Context, from time.Time, to time.Time, themeId string) (float64, error) {
+	return s.requestRepository.GetCountWithThemeId(ctx, from, to, themeId)
+}
+func (s *Service) GetCountWithThemeIdAndStatus(ctx context.Context, themeId string, status model.RequestStatus) (float64, error) {
+	return s.requestRepository.GetCountWithThemeIdAndStatus(ctx, themeId, int(status))
 }

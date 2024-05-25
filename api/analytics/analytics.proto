@@ -6,9 +6,12 @@ option go_package = "github.com/esklo/residents-tracking-platform-backend/gen/pr
 
 import "theme/theme.proto";
 import "google/protobuf/timestamp.proto";
+import "empty/empty.proto";
 
 service AnalyticsService {
   rpc RequestsPerTheme(RequestsPerThemeRequest) returns (RequestsPerThemeResponse) {};
+  rpc Stats(empty.Empty) returns (StatsResponse) {};
+  rpc RequestsPerThemePerDate(RequestsPerThemeRequest) returns (RequestsPerThemePerDateResponse) {};
 }
 
 message RequestsPerThemeRequest {
@@ -23,4 +26,26 @@ message RequestsPerThemeResponse {
 message RequestsPerTheme {
   int64 count = 1;
   theme.Theme theme = 2;
+}
+
+message StatsElement {
+  int64 week_count = 1;
+  float week_delta = 2;
+  int64 month_count = 3;
+  float month_delta = 4;
+  int64 open_count = 5;
+}
+
+message StatsResponse {
+  StatsElement data = 1;
+}
+
+message RequestsPerThemePerDate  {
+  int64 count = 1;
+  theme.Theme theme = 2;
+  google.protobuf.Timestamp date = 3;
+}
+
+message RequestsPerThemePerDateResponse {
+  repeated RequestsPerThemePerDate data = 1;
 }

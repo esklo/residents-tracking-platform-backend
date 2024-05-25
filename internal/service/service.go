@@ -6,6 +6,7 @@ import (
 	"github.com/esklo/residents-tracking-platform-backend/internal/model"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/google/uuid"
+	"time"
 )
 
 type UserService interface {
@@ -55,6 +56,7 @@ type DepartmentService interface {
 	Create(ctx context.Context, department *model.Department) (*model.Department, error)
 	Get(ctx context.Context, id *uuid.UUID) (*model.Department, error)
 	GetAll(ctx context.Context, districtId *uuid.UUID) ([]*model.Department, error)
+	Update(ctx context.Context, department *model.Department) error
 }
 
 type ThemeService interface {
@@ -63,6 +65,7 @@ type ThemeService interface {
 	GetAll(ctx context.Context, districtId *uuid.UUID) ([]*model.Theme, error)
 	Update(ctx context.Context, theme *model.Theme) error
 	Delete(ctx context.Context, id *uuid.UUID) error
+	GetAllWithDepartment(ctx context.Context, department *uuid.UUID) ([]*model.Theme, error)
 }
 
 type ContactService interface {
@@ -75,4 +78,12 @@ type RequestService interface {
 	Get(ctx context.Context, id *uuid.UUID) (*model.Request, error)
 	GetAll(ctx context.Context) ([]*model.Request, error)
 	GetAllAsGeoJson(ctx context.Context) ([]byte, error)
+	GetCountWithThemeId(ctx context.Context, from time.Time, to time.Time, themeId string) (float64, error)
+	GetCountWithThemeIdAndStatus(ctx context.Context, themeId string, status model.RequestStatus) (float64, error)
+}
+
+type AnalyticsService interface {
+	RequestsPerTheme(ctx context.Context, from time.Time, to time.Time, departmentId *uuid.UUID) ([]*model.RequestsPerTheme, error)
+	Stats(ctx context.Context, departmentId *uuid.UUID) (*model.StatsElement, error)
+	RequestsPerThemePerDate(ctx context.Context, departmentId *uuid.UUID, from time.Time, to time.Time) ([]*model.RequestsPerThemePerDateElement, error)
 }

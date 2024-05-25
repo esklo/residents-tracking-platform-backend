@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	protoAnalytics "github.com/esklo/residents-tracking-platform-backend/gen/proto/analytics"
 	protoAuth "github.com/esklo/residents-tracking-platform-backend/gen/proto/auth"
 	protoContact "github.com/esklo/residents-tracking-platform-backend/gen/proto/contact"
 	protoDepartment "github.com/esklo/residents-tracking-platform-backend/gen/proto/department"
@@ -135,6 +136,7 @@ func (a *App) initGRPCServer(_ context.Context) error {
 	protoTheme.RegisterThemeServiceServer(a.grpcServer, a.serviceProvider.ThemeImpl())
 	protoRequest.RegisterRequestServiceServer(a.grpcServer, a.serviceProvider.RequestImpl())
 	protoContact.RegisterContactServiceServer(a.grpcServer, a.serviceProvider.ContactImpl())
+	protoAnalytics.RegisterAnalyticsServiceServer(a.grpcServer, a.serviceProvider.AnalyticsImpl())
 	return nil
 }
 
@@ -143,7 +145,16 @@ func (a *App) runHTTPServer() error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	mux := runtime.NewServeMux()
+	mux := runtime.NewServeMux(
+		runtime.WithIncomingHeaderMatcher(func(key string) (string, bool) {
+			switch key {
+			case "X-Created-At-Override":
+				return "created_at", true
+			default:
+				return key, false
+			}
+		}),
+	)
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
@@ -181,6 +192,10 @@ func (a *App) runHTTPServer() error {
 
 	if err := protoContact.RegisterContactServiceHandlerFromEndpoint(ctx, mux, a.serviceProvider.GRPCConfig().Address(), opts); err != nil {
 		return errors.Wrap(err, "failed to register contact HTTP server")
+	}
+
+	if err := protoAnalytics.RegisterAnalyticsServiceHandlerFromEndpoint(ctx, mux, a.serviceProvider.GRPCConfig().Address(), opts); err != nil {
+		return errors.Wrap(err, "failed to register analytics HTTP server")
 	}
 
 	withCors := cors.AllowAll().Handler(mux)

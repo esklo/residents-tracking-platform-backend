@@ -1,0 +1,1 @@
+ALTER TABLE departments ADD full_access bool DEFAULT FALSE;

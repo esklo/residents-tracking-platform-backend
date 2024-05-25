@@ -5,6 +5,7 @@ import (
 	"github.com/esklo/residents-tracking-platform-backend/internal/model"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/google/uuid"
+	"time"
 )
 
 type UserRepository interface {
@@ -43,6 +44,7 @@ type DepartmentRepository interface {
 	Create(ctx context.Context, department *model.Department) (*model.Department, error)
 	GetAll(ctx context.Context) ([]*model.Department, error)
 	GetAllWithDistrictId(ctx context.Context, districtId string) ([]*model.Department, error)
+	Update(ctx context.Context, department *model.Department) error
 }
 
 type ThemeRepository interface {
@@ -65,4 +67,6 @@ type RequestRepository interface {
 	GetAll(ctx context.Context) ([]*model.Request, error)
 	GetFiles(ctx context.Context, id string) ([]*uuid.UUID, error)
 	AddFile(ctx context.Context, requestId, fileId string) error
+	GetCountWithThemeId(ctx context.Context, from time.Time, to time.Time, themeId string) (float64, error)
+	GetCountWithThemeIdAndStatus(ctx context.Context, themeId string, status int) (float64, error)
 }

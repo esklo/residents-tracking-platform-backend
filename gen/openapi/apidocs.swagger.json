@@ -75,6 +75,70 @@
         ]
       }
     },
+    "/analytics.AnalyticsService/RequestsPerThemePerDate": {
+      "post": {
+        "operationId": "AnalyticsService_RequestsPerThemePerDate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/analyticsRequestsPerThemePerDateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/analyticsRequestsPerThemeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AnalyticsService"
+        ]
+      }
+    },
+    "/analytics.AnalyticsService/Stats": {
+      "post": {
+        "operationId": "AnalyticsService_Stats",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/analyticsStatsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/emptyEmpty"
+            }
+          }
+        ],
+        "tags": [
+          "AnalyticsService"
+        ]
+      }
+    },
     "/auth.AuthService/ChangePassword": {
       "post": {
         "operationId": "AuthService_ChangePassword",
@@ -1625,6 +1689,34 @@
         }
       }
     },
+    "analyticsRequestsPerThemePerDate": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "string",
+          "format": "int64"
+        },
+        "theme": {
+          "$ref": "#/definitions/themeTheme"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "analyticsRequestsPerThemePerDateResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/analyticsRequestsPerThemePerDate"
+          }
+        }
+      }
+    },
     "analyticsRequestsPerThemeRequest": {
       "type": "object",
       "properties": {
@@ -1647,6 +1739,39 @@
             "type": "object",
             "$ref": "#/definitions/analyticsRequestsPerTheme"
           }
+        }
+      }
+    },
+    "analyticsStatsElement": {
+      "type": "object",
+      "properties": {
+        "weekCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "weekDelta": {
+          "type": "number",
+          "format": "float"
+        },
+        "monthCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "monthDelta": {
+          "type": "number",
+          "format": "float"
+        },
+        "openCount": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "analyticsStatsResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/analyticsStatsElement"
         }
       }
     },
@@ -1813,6 +1938,9 @@
         },
         "districtId": {
           "type": "string"
+        },
+        "fullAccess": {
+          "type": "boolean"
         }
       }
     },
@@ -1827,6 +1955,9 @@
         },
         "districtId": {
           "type": "string"
+        },
+        "fullAccess": {
+          "type": "boolean"
         }
       }
     },

@@ -16,6 +16,7 @@ service DepartmentService {
 message CreateRequest {
   string title = 1;
   string district_id = 2;
+  bool full_access = 3;
 }
 
 message ByIdRequest {
@@ -35,4 +36,5 @@ message Department {
   string id = 1;
   string title = 2;
   string district_id = 3;
+  bool full_access = 4;
 }

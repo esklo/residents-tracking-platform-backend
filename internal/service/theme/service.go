@@ -66,3 +66,7 @@ func (s *Service) Delete(ctx context.Context, id *uuid.UUID) error {
 	theme.DeletedAt = &deletedAt
 	return s.Update(ctx, theme)
 }
+
+func (s *Service) GetAllWithDepartment(ctx context.Context, department *uuid.UUID) ([]*model.Theme, error) {
+	return s.themeRepository.GetAllWithDepartmentIds(ctx, []string{department.String()}, false)
+}

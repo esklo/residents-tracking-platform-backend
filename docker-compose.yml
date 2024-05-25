@@ -14,16 +14,23 @@ services:
       - ./docker/postgres:/docker-entrypoint-initdb.d/
     networks:
       - network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DATABASE} -U $${POSTGRES_USER}" ]
+      interval: 5s
+      timeout: 10s
+      retries: 15
+      start_period: 80s
   app:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     volumes:
       - ./:/app
     env_file:
       - .env
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - network
     ports:

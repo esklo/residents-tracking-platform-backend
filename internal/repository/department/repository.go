@@ -28,11 +28,12 @@ func (r *Repository) GetByID(_ context.Context, id string) (*model.Department, e
 	}
 
 	var department model.Department
-	err = connection.QueryRow(`select id, title, district_id from departments where id = $1`, id).
+	err = connection.QueryRow(`select id, title, district_id, full_access from departments where id = $1`, id).
 		Scan(
 			&department.Id,
 			&department.Title,
 			&department.DistrictId,
+			&department.FullAccess,
 		)
 	if err != nil {
 		return nil, err
@@ -51,9 +52,9 @@ func (r *Repository) Create(_ context.Context, department *model.Department) (*m
 	}
 
 	_, err = connection.Exec(`
-		insert into departments (title,district_id) 
-		values ($1,$2)
-	`, department.Title, department.DistrictId)
+		insert into departments (title,district_id,full_access) 
+		values ($1,$2,$3)
+	`, department.Title, department.DistrictId, department.FullAccess)
 	if err != nil {
 		return nil, errors.Wrap(err, "can not execute create query")
 	}
@@ -65,7 +66,7 @@ func (r *Repository) GetAll(_ context.Context) ([]*model.Department, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "can not get database connection")
 	}
-	rows, err := connection.Query("select id, title, district_id from departments")
+	rows, err := connection.Query("select id, title, district_id, full_access from departments")
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +75,7 @@ func (r *Repository) GetAll(_ context.Context) ([]*model.Department, error) {
 	var departments []*model.Department
 	for rows.Next() {
 		var department model.Department
-		err := rows.Scan(&department.Id, &department.Title, &department.DistrictId)
+		err := rows.Scan(&department.Id, &department.Title, &department.DistrictId, &department.FullAccess)
 		if err != nil {
 			return nil, err
 		}
@@ -88,7 +89,7 @@ func (r *Repository) GetAllWithDistrictId(ctx context.Context, districtId string
 	if err != nil {
 		return nil, errors.Wrap(err, "can not get database connection")
 	}
-	rows, err := connection.Query("select id, title, district_id from departments where district_id=$1", districtId)
+	rows, err := connection.Query("select id, title, district_id, full_access from departments where district_id=$1", districtId)
 	if err != nil {
 		return nil, err
 	}
@@ -97,11 +98,34 @@ func (r *Repository) GetAllWithDistrictId(ctx context.Context, districtId string
 	var departments []*model.Department
 	for rows.Next() {
 		var department model.Department
-		err := rows.Scan(&department.Id, &department.Title, &department.DistrictId)
+		err := rows.Scan(&department.Id, &department.Title, &department.DistrictId, &department.FullAccess)
 		if err != nil {
 			return nil, err
 		}
 		departments = append(departments, &department)
 	}
 	return departments, nil
+}
+
+func (r *Repository) Update(ctx context.Context, department *model.Department) error {
+	if department == nil {
+		return errors.New("department is nil")
+	}
+
+	if department.Id == uuid.Nil {
+		return errors.New("department id is nil")
+	}
+
+	connection, err := r.getConnection()
+	if err != nil {
+		return errors.Wrap(err, "can not get database connection")
+	}
+
+	_, err = connection.Exec(`
+		update departments set title = $1, district_id = $2, full_access=$3 where id = $4
+	`, department.Title, department.DistrictId, department.FullAccess, department.Id)
+	if err != nil {
+		return errors.Wrap(err, "can not execute update query")
+	}
+	return nil
 }

@@ -3,6 +3,7 @@ package provider
 import (
 	"database/sql"
 	"github.com/ekomobile/dadata/v2/api/suggest"
+	"github.com/esklo/residents-tracking-platform-backend/internal/api/analytics"
 	"github.com/esklo/residents-tracking-platform-backend/internal/api/auth"
 	"github.com/esklo/residents-tracking-platform-backend/internal/api/contact"
 	"github.com/esklo/residents-tracking-platform-backend/internal/api/department"
@@ -46,6 +47,7 @@ type ServiceProvider struct {
 	themeService      service.ThemeService
 	requestService    service.RequestService
 	contactService    service.ContactService
+	analyticsService  service.AnalyticsService
 
 	userImpl       *user.Implementation
 	authImpl       *auth.Implementation
@@ -56,6 +58,7 @@ type ServiceProvider struct {
 	themeImpl      *theme.Implementation
 	requestImpl    *request.Implementation
 	contactImpl    *contact.Implementation
+	analyticsImpl  *analytics.Implementation
 
 	databaseConnection *sql.DB
 	webauthn           *webauthn.WebAuthn
