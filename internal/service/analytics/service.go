@@ -5,6 +5,7 @@ import (
 	"github.com/esklo/residents-tracking-platform-backend/internal/model"
 	def "github.com/esklo/residents-tracking-platform-backend/internal/service"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"time"
 )
@@ -33,6 +34,9 @@ func NewService(
 }
 
 func (s *Service) GetDepartmentThemes(ctx context.Context, departmentId *uuid.UUID) ([]*model.Theme, error) {
+	if departmentId == nil {
+		return nil, errors.New("department id is nil")
+	}
 	department, err := s.departmentService.Get(ctx, departmentId)
 	if err != nil {
 		return nil, err
