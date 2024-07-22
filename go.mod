@@ -7,7 +7,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.27.9
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.9
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.53.0
-	github.com/davecgh/go-spew v1.1.1
 	github.com/ekomobile/dadata/v2 v2.11.0
 	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/go-webauthn/webauthn v0.10.2
@@ -22,7 +21,9 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/cors v1.10.1
 	github.com/serjvanilla/go-overpass v0.0.0-20220918094045-58606372f808
+	github.com/stretchr/testify v1.9.0
 	github.com/twpayne/go-geom v1.5.4
+	go.uber.org/mock v0.4.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.21.0
 	google.golang.org/grpc v1.62.1
@@ -45,6 +46,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.23.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.28.5 // indirect
 	github.com/aws/smithy-go v1.20.1 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fxamacker/cbor/v2 v2.6.0 // indirect
 	github.com/go-webauthn/x v0.1.9 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
@@ -52,6 +54,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	go.uber.org/atomic v1.7.0 // indirect

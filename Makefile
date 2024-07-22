@@ -1,3 +1,4 @@
+.PHONY: mocks
 MODULE:="github.com/esklo/residents-tracking-platform-backend"
 generate:
 	rm -rf gen/*
@@ -14,17 +15,6 @@ generate:
         --openapiv2_opt=generate_unbound_methods=true \
         --openapiv2_opt allow_merge=true \
         */*.proto
-.PHONY: graph
-RANKDIRS = LR TB
-GROUPTYPE = pkg type pkg,type type,pkg
-FOCUSES = github.com/esklo/residents-tracking-platform-backend/internal/app github.com/esklo/residents-tracking-platform-backend/internal/app/provider github.com/esklo/residents-tracking-platform-backend/internal/model github.com/esklo/residents-tracking-platform-backend/internal/repository/user github.com/esklo/residents-tracking-platform-backend/internal/config
-graph:
-	@for rankdir in $(RANKDIRS); do \
-        for group in $(GROUPTYPE); do \
-          for focus in $(FOCUSES); do \
-            focus_file=$$(echo $$focus | sed 's/\//_/g'); \
-            go-callvis -file "graphvis/$${focus_file}_gv_$${rankdir}_$${group}" -graphviz -rankdir $$rankdir -group $$group -nostd -ignore github.com/esklo/residents-tracking-platform-backend/gen/proto,google,\*google,github.com/pkg,\*github.com/pkg -focus $$focus -format png cmd/api/main.go & \
-          done; \
-          wait; \
-        done; \
-    done;
+mocks:
+	mockgen -source=internal/repository/repository.go -destination=mocks/repository.go -package=mocks
+	mockgen -source=internal/service/service.go -destination=mocks/service.go -package=mocks
