@@ -38,7 +38,7 @@
 ```
 
 ### Database architecture
-![alt text](./assets/er.png)
+![er](./assets/er.jpeg)
 
 #### Sources
 [Golang Clean Architecture](https://github.com/bxcodec/go-clean-arch)
