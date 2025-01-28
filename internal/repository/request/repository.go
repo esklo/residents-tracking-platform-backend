@@ -33,7 +33,7 @@ func (r *Repository) GetByID(ctx context.Context, id string) (*model.Request, er
 	var geo []byte
 	var request model.Request
 	var contactId uuid.UUID
-	err = connection.QueryRow(`select id, description, ST_AsEWKB(geo), address, created_at, deleted_at, status, priority, theme_id, user_id, contact_id from requests where id = $1`, id).
+	err = connection.QueryRow(`select id, description, ST_AsEWKB(geo), address, created_at, deleted_at, status, priority, theme_id, user_id, contact_id, deadline from requests where id = $1`, id).
 		Scan(
 			&request.Id,
 			&request.Description,
@@ -46,6 +46,7 @@ func (r *Repository) GetByID(ctx context.Context, id string) (*model.Request, er
 			&request.ThemeId,
 			&request.UserId,
 			&contactId,
+			&request.Deadline,
 		)
 	if err != nil {
 		return nil, err
@@ -75,8 +76,8 @@ func (r *Repository) Create(ctx context.Context, request *model.Request) (*model
 	}
 
 	_, err = connection.Exec(`
-		insert into requests (id, description, geo, address, created_at, deleted_at, status, priority, theme_id, user_id, contact_id) 
-		values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+		insert into requests (id, description, geo, address, created_at, deleted_at, status, priority, theme_id, user_id, contact_id,deadline) 
+		values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
 	`,
 		request.Id,
 		request.Description,
@@ -89,6 +90,7 @@ func (r *Repository) Create(ctx context.Context, request *model.Request) (*model
 		request.ThemeId,
 		request.UserId,
 		request.Contact.Id,
+		request.Deadline,
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "can not execute create query")
@@ -101,7 +103,7 @@ func (r *Repository) GetAll(ctx context.Context) ([]*model.Request, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "can not get database connection")
 	}
-	rows, err := connection.Query("select id, description, ST_AsEWKB(geo), address, created_at, deleted_at, status, priority, theme_id, user_id, contact_id from requests")
+	rows, err := connection.Query("select id, description, ST_AsEWKB(geo), address, created_at, deleted_at, status, priority, theme_id, user_id, contact_id, deadline from requests")
 	if err != nil {
 		return nil, err
 	}
@@ -124,6 +126,7 @@ func (r *Repository) GetAll(ctx context.Context) ([]*model.Request, error) {
 			&request.ThemeId,
 			&request.UserId,
 			&contactId,
+			&request.Deadline,
 		)
 		if err != nil {
 			return nil, err
@@ -187,6 +190,24 @@ func (r *Repository) AddFile(ctx context.Context, requestId, fileId string) erro
 	return nil
 }
 
+func (r *Repository) RemoveFile(ctx context.Context, requestId, fileId string) error {
+	connection, err := r.getConnection()
+	if err != nil {
+		return errors.Wrap(err, "can not get database connection")
+	}
+
+	_, err = connection.Exec(`
+		delete from requests_files where request_id=$1 and file_id=$2
+	`,
+		requestId,
+		fileId,
+	)
+	if err != nil {
+		return errors.Wrap(err, "can not execute delete query")
+	}
+	return nil
+}
+
 func (r *Repository) GetCountWithThemeId(ctx context.Context, from time.Time, to time.Time, themeId string) (float64, error) {
 	connection, err := r.getConnection()
 	if err != nil {
@@ -221,4 +242,34 @@ func (r *Repository) GetCountWithThemeIdAndStatus(ctx context.Context, themeId s
 	}
 
 	return count, nil
+}
+
+func (r *Repository) Update(ctx context.Context, request *model.Request) error {
+	if request.Id == uuid.Nil {
+		return errors.New("request id is nil")
+	}
+	connection, err := r.getConnection()
+	if err != nil {
+		return errors.Wrap(err, "can not get database connection")
+	}
+
+	_, err = connection.Exec(`
+		update requests set description=$2, geo=$3, address=$4, status=$5, priority=$6, theme_id=$7, user_id=$8, contact_id=$9,deadline=$10
+		where id=$1
+	`,
+		request.Id,
+		request.Description,
+		fmt.Sprintf("POINT(%f %f)", request.Geo.Lon, request.Geo.Lat),
+		request.Address,
+		request.Status,
+		request.Priority,
+		request.ThemeId,
+		request.UserId,
+		request.Contact.Id,
+		request.Deadline,
+	)
+	if err != nil {
+		return errors.Wrap(err, "can not execute update query")
+	}
+	return nil
 }

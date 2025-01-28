@@ -1195,6 +1195,38 @@
         ]
       }
     },
+    "/request.RequestService/ExportExcel": {
+      "post": {
+        "operationId": "RequestService_ExportExcel",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/requestExportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/emptyEmpty"
+            }
+          }
+        ],
+        "tags": [
+          "RequestService"
+        ]
+      }
+    },
     "/request.RequestService/Get": {
       "post": {
         "operationId": "RequestService_Get",
@@ -1298,7 +1330,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/requestRequest"
+              "$ref": "#/definitions/emptyEmpty"
             }
           },
           "default": {
@@ -1314,7 +1346,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestRequest"
+              "$ref": "#/definitions/requestUpdateRequest"
             }
           }
         ],
@@ -2266,6 +2298,18 @@
           "items": {
             "type": "string"
           }
+        },
+        "deadline": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "requestExportResponse": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "$ref": "#/definitions/fileFile"
         }
       }
     },
@@ -2357,6 +2401,10 @@
             "type": "object",
             "$ref": "#/definitions/fileFile"
           }
+        },
+        "deadline": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -2369,6 +2417,20 @@
         "StatusDeclined"
       ],
       "default": "StatusUnknown"
+    },
+    "requestUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "request": {
+          "$ref": "#/definitions/requestRequest"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     },
     "themeByIdRequest": {
       "type": "object",

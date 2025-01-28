@@ -30,6 +30,10 @@ func (s *Service) Create(ctx context.Context, contact *model.Contact) (*model.Co
 	return s.contactRepository.Create(ctx, contact)
 }
 
+func (s *Service) Update(ctx context.Context, contact *model.Contact) error {
+	return s.contactRepository.Update(ctx, contact)
+}
+
 func (s *Service) Get(ctx context.Context, id *uuid.UUID) (*model.Contact, error) {
 	return s.contactRepository.GetByID(ctx, id.String())
 }

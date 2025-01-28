@@ -70,16 +70,19 @@ type ThemeService interface {
 
 type ContactService interface {
 	Create(ctx context.Context, contact *model.Contact) (*model.Contact, error)
+	Update(ctx context.Context, contact *model.Contact) error
 	Get(ctx context.Context, id *uuid.UUID) (*model.Contact, error)
 }
 
 type RequestService interface {
-	Create(ctx context.Context, themeId *uuid.UUID, description, address string, contact *model.Contact, geo model.GeoPoint, fileIds []*uuid.UUID) (*model.Request, error)
+	Create(ctx context.Context, themeId *uuid.UUID, description, address string, contact *model.Contact, geo model.GeoPoint, fileIds []*uuid.UUID, deadline *time.Time) (*model.Request, error)
 	Get(ctx context.Context, id *uuid.UUID) (*model.Request, error)
 	GetAll(ctx context.Context) ([]*model.Request, error)
 	GetAllAsGeoJson(ctx context.Context) ([]byte, error)
 	GetCountWithThemeId(ctx context.Context, from time.Time, to time.Time, themeId string) (float64, error)
 	GetCountWithThemeIdAndStatus(ctx context.Context, themeId string, status model.RequestStatus) (float64, error)
+	Update(ctx context.Context, request *model.Request, fileIds []*uuid.UUID) error
+	ExportExcel(ctx context.Context) (*model.File, error)
 }
 
 type AnalyticsService interface {

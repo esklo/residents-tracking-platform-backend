@@ -25,6 +25,7 @@ type Request struct {
 	Contact     *Contact        `json:"contact,omitempty"`
 	UserId      *uuid.UUID      `json:"userId,omitempty"`
 	Files       []*File         `json:"files,omitempty"`
+	Deadline    *time.Time      `json:"deadline,omitempty"`
 	//todo
 }
 
@@ -57,6 +58,9 @@ func (r *Request) ToProto() (*protoRequest.Request, error) {
 	}
 	if r.DeletedAt != nil {
 		request.DeletedAt = timestamppb.New(*r.DeletedAt)
+	}
+	if r.Deadline != nil {
+		request.Deadline = timestamppb.New(*r.Deadline)
 	}
 	switch r.Status {
 	case RequestStatusOpen:

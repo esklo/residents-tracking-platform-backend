@@ -14,9 +14,10 @@ service RequestService {
   rpc Create(CreateRequest) returns (Request);
   rpc GetById(ByIdRequest) returns (Request);
   rpc Get(GetRequest) returns (GetResponse);
-  rpc Update(Request) returns (Request);
+  rpc Update(UpdateRequest) returns (empty.Empty);
   rpc Delete(ByIdRequest) returns (empty.Empty);
   rpc GetAsGeoJson(GetRequest) returns (GetAsGeoJsonResponse);
+  rpc ExportExcel(empty.Empty) returns (ExportResponse);
 }
 
 message GetAsGeoJsonResponse {
@@ -30,6 +31,12 @@ message CreateRequest {
   string theme_id = 4;
   contact.Contact contact = 5;
   repeated string files = 6;
+  optional google.protobuf.Timestamp deadline = 7;
+}
+
+message UpdateRequest {
+  Request request = 1;
+  repeated string files = 2;
 }
 
 message ByIdRequest {
@@ -73,4 +80,9 @@ message Request {
   string user_id = 10;
   contact.Contact contact = 11;
   repeated file.File files = 12;
+  optional google.protobuf.Timestamp deadline = 13;
+}
+
+message ExportResponse {
+  file.File file = 1;
 }

@@ -24,6 +24,9 @@ func (s *ServiceProvider) RequestService() service.RequestService {
 			s.RequestRepository(),
 			s.ContactService(),
 			s.FileService(),
+			s.ThemeService(),
+			s.DepartmentService(),
+			s.UserService(),
 			s.GetLogger(),
 		)
 	}
