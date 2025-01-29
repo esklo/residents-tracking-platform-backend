@@ -27,7 +27,23 @@ func (i *Implementation) Get(ctx context.Context, req *proto.GetRequest) (*proto
 		districtId = &department.DistrictId
 	}
 
-	users, err := i.userService.GetAll(ctx, districtId)
+	var users []*model.User
+	if req.ThemeId != nil {
+		themeId, err := uuid.Parse(*req.ThemeId)
+		if err != nil {
+			return nil, errors.Wrap(err, "can not parse theme id")
+		}
+		users, err = i.userService.GetAllForThemeId(ctx, &themeId)
+	} else if req.DepartmentId != nil {
+		departmentId, err := uuid.Parse(*req.DepartmentId)
+		if err != nil {
+			return nil, errors.Wrap(err, "can not parse department id")
+		}
+		users, err = i.userService.GetAllWithinDepartment(ctx, &departmentId)
+	} else {
+		users, err = i.userService.GetAll(ctx, districtId)
+	}
+
 	if err != nil {
 		return nil, err
 	}

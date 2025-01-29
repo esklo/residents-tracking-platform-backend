@@ -14,6 +14,8 @@ type UserService interface {
 	Get(ctx context.Context, id string) (*model.User, error)
 	Update(ctx context.Context, user *model.User) error
 	GetAll(ctx context.Context, districtId *uuid.UUID) ([]*model.User, error)
+	GetAllWithinDepartment(ctx context.Context, departmentId *uuid.UUID) ([]*model.User, error)
+	GetAllForThemeId(ctx context.Context, themeId *uuid.UUID) ([]*model.User, error)
 }
 
 type AuthService interface {
@@ -78,11 +80,12 @@ type RequestService interface {
 	Create(ctx context.Context, themeId *uuid.UUID, description, address string, contact *model.Contact, geo model.GeoPoint, fileIds []*uuid.UUID, deadline *time.Time) (*model.Request, error)
 	Get(ctx context.Context, id *uuid.UUID) (*model.Request, error)
 	GetAll(ctx context.Context) ([]*model.Request, error)
-	GetAllAsGeoJson(ctx context.Context) ([]byte, error)
+	GetAllWithDepartment(ctx context.Context, department *uuid.UUID) ([]*model.Request, error)
+	GetAllAsGeoJsonWithDepartment(ctx context.Context, department *uuid.UUID) ([]byte, error)
 	GetCountWithThemeId(ctx context.Context, from time.Time, to time.Time, themeId string) (float64, error)
 	GetCountWithThemeIdAndStatus(ctx context.Context, themeId string, status model.RequestStatus) (float64, error)
 	Update(ctx context.Context, request *model.Request, fileIds []*uuid.UUID) error
-	ExportExcel(ctx context.Context) (*model.File, error)
+	ExportExcel(ctx context.Context, departmentId *uuid.UUID) (*model.File, error)
 }
 
 type AnalyticsService interface {

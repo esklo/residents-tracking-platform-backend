@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/twpayne/go-geom/encoding/ewkb"
+	"strings"
 	"time"
 )
 
@@ -104,6 +105,56 @@ func (r *Repository) GetAll(ctx context.Context) ([]*model.Request, error) {
 		return nil, errors.Wrap(err, "can not get database connection")
 	}
 	rows, err := connection.Query("select id, description, ST_AsEWKB(geo), address, created_at, deleted_at, status, priority, theme_id, user_id, contact_id, deadline from requests")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var requests []*model.Request
+	for rows.Next() {
+		var request model.Request
+		var contactId uuid.UUID
+		var geo []byte
+		err := rows.Scan(
+			&request.Id,
+			&request.Description,
+			&geo,
+			&request.Address,
+			&request.CreatedAt,
+			&request.DeletedAt,
+			&request.Status,
+			&request.Priority,
+			&request.ThemeId,
+			&request.UserId,
+			&contactId,
+			&request.Deadline,
+		)
+		if err != nil {
+			return nil, err
+		}
+		request.Contact = &model.Contact{
+			Id: contactId,
+		}
+		point, err := ewkb.Unmarshal(geo)
+		if err != nil {
+			return nil, err
+		}
+		request.Geo = model.GeoPoint{
+			Lat: point.FlatCoords()[1],
+			Lon: point.FlatCoords()[0],
+		}
+		requests = append(requests, &request)
+	}
+	return requests, nil
+}
+
+func (r *Repository) GetAllWithThemeIds(ctx context.Context, themeIds []string) ([]*model.Request, error) {
+	connection, err := r.getConnection()
+	if err != nil {
+		return nil, errors.Wrap(err, "can not get database connection")
+	}
+	rows, err := connection.Query(
+		fmt.Sprintf("select id, description, ST_AsEWKB(geo), address, created_at, deleted_at, status, priority, theme_id, user_id, contact_id, deadline from requests where theme_id in (%s)", fmt.Sprintf("'%s'", strings.Join(themeIds, "','"))))
 	if err != nil {
 		return nil, err
 	}

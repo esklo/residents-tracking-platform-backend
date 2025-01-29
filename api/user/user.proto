@@ -43,6 +43,8 @@ message ByIdRequest {
 message GetRequest {
   optional int64 limit = 1;
   optional int64 offset = 2;
+  optional string themeId = 3;
+  optional string departmentId = 4;
 }
 
 message GetResponse {

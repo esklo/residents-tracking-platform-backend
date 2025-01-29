@@ -152,8 +152,51 @@ func (s *Service) GetAll(ctx context.Context) ([]*model.Request, error) {
 	return requests, nil
 }
 
-func (s *Service) GetAllAsGeoJson(ctx context.Context) ([]byte, error) {
-	requests, err := s.GetAll(ctx)
+func (s *Service) GetAllWithDepartment(ctx context.Context, departmentId *uuid.UUID) ([]*model.Request, error) {
+	department, err := s.departmentService.Get(ctx, departmentId)
+	if department.FullAccess {
+		return s.GetAll(ctx)
+	}
+
+	themes, err := s.themeService.GetAllWithDepartment(ctx, departmentId)
+	if err != nil {
+		return nil, err
+	}
+	var themeIds []string
+	for _, theme := range themes {
+		themeIds = append(themeIds, theme.Id.String())
+	}
+	requests, err := s.requestRepository.GetAllWithThemeIds(ctx, themeIds)
+
+	if err != nil {
+		return nil, err
+	}
+	for _, request := range requests {
+		contact, err := s.contactService.Get(ctx, &request.Contact.Id)
+		if err != nil {
+			return nil, err
+		}
+		request.Contact = contact
+
+		fileIds, err := s.requestRepository.GetFiles(ctx, request.Id.String())
+		if err != nil {
+			return nil, err
+		}
+		var files []*model.File
+		for _, fileId := range fileIds {
+			file, err := s.fileService.GetById(ctx, fileId)
+			if err != nil {
+				return nil, err
+			}
+			files = append(files, file)
+		}
+		request.Files = files
+	}
+	return requests, nil
+}
+
+func (s *Service) GetAllAsGeoJsonWithDepartment(ctx context.Context, department *uuid.UUID) ([]byte, error) {
+	requests, err := s.GetAllWithDepartment(ctx, department)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +268,7 @@ func (s *Service) Update(ctx context.Context, request *model.Request, fileIds []
 
 }
 
-func (s *Service) ExportExcel(ctx context.Context) (*model.File, error) {
+func (s *Service) ExportExcel(ctx context.Context, departmentId *uuid.UUID) (*model.File, error) {
 	sheet := "Sheet1"
 
 	f := excelize.NewFile()
@@ -258,7 +301,7 @@ func (s *Service) ExportExcel(ctx context.Context) (*model.File, error) {
 		f.SetCellValue(sheet, fmt.Sprintf("%s%d", string(rune(65+i)), 1), header)
 	}
 
-	requests, err := s.requestRepository.GetAll(ctx)
+	requests, err := s.GetAllWithDepartment(ctx, departmentId)
 	if err != nil {
 		return nil, err
 	}
@@ -266,7 +309,6 @@ func (s *Service) ExportExcel(ctx context.Context) (*model.File, error) {
 	for i, request := range requests {
 		theme, _ := s.themeService.Get(ctx, request.ThemeId)
 		dep, _ := s.departmentService.Get(ctx, &theme.DepartmentId)
-		user, _ := s.userService.Get(ctx, request.UserId.String())
 		request.Contact, _ = s.contactService.Get(ctx, &request.Contact.Id)
 		var row []any
 		row = appendExcelRow(row, request.Id)
@@ -276,10 +318,18 @@ func (s *Service) ExportExcel(ctx context.Context) (*model.File, error) {
 		row = appendExcelRow(row, theme.DepartmentId)
 		row = appendExcelRow(row, dep.Title)
 		row = appendExcelRow(row, request.UserId)
-		row = appendExcelRow(row, *user.LastName)
-		row = appendExcelRow(row, user.FirstName)
-		row = appendExcelRow(row, *user.FatherName)
-		row = appendExcelRow(row, user.Email)
+		if request.UserId != nil {
+			user, _ := s.userService.Get(ctx, request.UserId.String())
+			row = appendExcelRow(row, *user.LastName)
+			row = appendExcelRow(row, user.FirstName)
+			row = appendExcelRow(row, *user.FatherName)
+			row = appendExcelRow(row, user.Email)
+		} else {
+			row = appendExcelRow(row, nil)
+			row = appendExcelRow(row, nil)
+			row = appendExcelRow(row, nil)
+			row = appendExcelRow(row, nil)
+		}
 		row = appendExcelRow(row, request.Description)
 		row = appendExcelRow(row, request.Address)
 		row = appendExcelRow(row, request.Geo.Lon)

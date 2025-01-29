@@ -11,17 +11,20 @@ var _ def.UserService = (*Service)(nil)
 type Service struct {
 	userRepository    repository.UserRepository
 	departmentService def.DepartmentService
+	themeService      def.ThemeService
 	logger            *zap.Logger
 }
 
 func NewService(
 	userRepository repository.UserRepository,
 	departmentService def.DepartmentService,
+	themeService def.ThemeService,
 	logger *zap.Logger,
 ) *Service {
 	return &Service{
 		userRepository:    userRepository,
 		departmentService: departmentService,
+		themeService:      themeService,
 		logger:            logger,
 	}
 }

@@ -65,6 +65,7 @@ type RequestRepository interface {
 	GetByID(ctx context.Context, id string) (*model.Request, error)
 	Create(ctx context.Context, request *model.Request) (*model.Request, error)
 	GetAll(ctx context.Context) ([]*model.Request, error)
+	GetAllWithThemeIds(ctx context.Context, themeIds []string) ([]*model.Request, error)
 	GetFiles(ctx context.Context, id string) ([]*uuid.UUID, error)
 	AddFile(ctx context.Context, requestId, fileId string) error
 	RemoveFile(ctx context.Context, requestId, fileId string) error

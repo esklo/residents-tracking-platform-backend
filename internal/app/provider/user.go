@@ -23,6 +23,7 @@ func (s *ServiceProvider) UserService() service.UserService {
 		s.userService = userService.NewService(
 			s.UserRepository(),
 			s.DepartmentService(),
+			s.ThemeService(),
 			s.GetLogger(),
 		)
 	}

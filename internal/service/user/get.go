@@ -35,3 +35,21 @@ func (s *Service) GetAll(ctx context.Context, districtId *uuid.UUID) ([]*model.U
 	}
 	return s.userRepository.GetAllWithDepartmentIds(ctx, departmentIds)
 }
+
+func (s *Service) GetAllWithinDepartment(ctx context.Context, departmentId *uuid.UUID) ([]*model.User, error) {
+	if departmentId == nil {
+		return nil, nil
+	}
+	return s.userRepository.GetAllWithDepartmentIds(ctx, []string{departmentId.String()})
+}
+
+func (s *Service) GetAllForThemeId(ctx context.Context, themeId *uuid.UUID) ([]*model.User, error) {
+	if themeId == nil {
+		return nil, nil
+	}
+	theme, err := s.themeService.Get(ctx, themeId)
+	if err != nil {
+		return nil, err
+	}
+	return s.GetAllWithinDepartment(ctx, &theme.DepartmentId)
+}

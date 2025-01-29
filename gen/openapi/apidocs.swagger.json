@@ -2546,6 +2546,12 @@
         "offset": {
           "type": "string",
           "format": "int64"
+        },
+        "themeId": {
+          "type": "string"
+        },
+        "departmentId": {
+          "type": "string"
         }
       }
     },
