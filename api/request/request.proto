@@ -24,14 +24,19 @@ message GetAsGeoJsonResponse {
   bytes geojson = 1;
 }
 
+//message CreateRequest {
+//  string description = 1;
+//  geo.GeoPoint geo = 2;
+//  string address = 3;
+//  string theme_id = 4;
+//  contact.Contact contact = 5;
+//  repeated string files = 6;
+//  optional google.protobuf.Timestamp deadline = 7;
+//  string comment = 8;
+//}
+
 message CreateRequest {
-  string description = 1;
-  geo.GeoPoint geo = 2;
-  string address = 3;
-  string theme_id = 4;
-  contact.Contact contact = 5;
-  repeated string files = 6;
-  optional google.protobuf.Timestamp deadline = 7;
+  Request request = 1;
 }
 
 message UpdateRequest {
@@ -78,9 +83,10 @@ message Request {
   Priority priority = 8;
   string theme_id = 9;
   string user_id = 10;
-  contact.Contact contact = 11;
+  optional contact.Contact contact = 11;
   repeated file.File files = 12;
   optional google.protobuf.Timestamp deadline = 13;
+  string comment = 14;
 }
 
 message ExportResponse {

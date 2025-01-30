@@ -11,9 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
-	"google.golang.org/grpc/metadata"
 	"reflect"
-	"strconv"
 	"time"
 )
 
@@ -49,47 +47,30 @@ func NewService(
 	}
 }
 
-func (s *Service) Create(ctx context.Context, themeId *uuid.UUID, description, address string, contact *model.Contact, geo model.GeoPoint, fileIds []*uuid.UUID, deadline *time.Time) (*model.Request, error) {
+func (s *Service) Create(ctx context.Context, request *model.Request) (*model.Request, error) {
 	var createdAt time.Time
 	createdAt = time.Now()
 
-	//todo: remove
-	md, _ := metadata.FromIncomingContext(ctx)
-	createdAts := md.Get("created_at")
-	if len(createdAts) > 0 {
-		i, err := strconv.ParseInt(createdAts[0], 10, 64)
-		if err != nil {
-			panic(err)
-		}
-		createdAt = time.Unix(i, 0)
-	}
-	//////
-
-	contactCreated, err := s.contactService.Create(ctx, contact)
+	contactCreated, err := s.contactService.Create(ctx, request.Contact)
 	if err != nil {
 		return nil, err
 	}
+	request.Contact = contactCreated
 
-	request, err := s.requestRepository.Create(ctx, &model.Request{
-		Description: description,
-		Geo:         geo,
-		Address:     address,
-		CreatedAt:   createdAt,
-		Status:      model.RequestStatusOpen,
-		ThemeId:     themeId,
-		Contact:     contactCreated,
-		Deadline:    deadline,
-	})
+	request.CreatedAt = createdAt
+	request.Status = model.RequestStatusOpen
+
+	request, err = s.requestRepository.Create(ctx, request)
 	if err != nil {
 		return nil, err
 	}
-	for _, fileId := range fileIds {
-		file, err := s.fileService.GetById(ctx, fileId)
+	for _, file := range request.Files {
+		file, err := s.fileService.GetById(ctx, &file.Id)
 		if err != nil {
 			return nil, err
 		}
 		request.Files = append(request.Files, file)
-		err = s.requestRepository.AddFile(ctx, request.Id.String(), fileId.String())
+		err = s.requestRepository.AddFile(ctx, request.Id.String(), file.Id.String())
 		if err != nil {
 			return nil, err
 		}
@@ -365,4 +346,21 @@ func appendExcelRow(row []any, value any) []any {
 		return append(row, val.Elem().Interface())
 	}
 	return append(row, value)
+}
+
+func (s *Service) Delete(ctx context.Context, id *uuid.UUID) error {
+	files, err := s.requestRepository.GetFiles(ctx, id.String())
+	if err != nil {
+		return errors.Wrap(err, "can not get request's files")
+	}
+	for _, fileId := range files {
+		if err := s.requestRepository.RemoveFile(ctx, id.String(), fileId.String()); err != nil {
+			return errors.Wrap(err, "can not remove file")
+		}
+
+		if err := s.fileService.Delete(ctx, fileId); err != nil {
+			return errors.Wrap(err, "can not delete file")
+		}
+	}
+	return s.requestRepository.Delete(ctx, id.String())
 }

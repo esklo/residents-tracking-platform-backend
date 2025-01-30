@@ -77,7 +77,7 @@ type ContactService interface {
 }
 
 type RequestService interface {
-	Create(ctx context.Context, themeId *uuid.UUID, description, address string, contact *model.Contact, geo model.GeoPoint, fileIds []*uuid.UUID, deadline *time.Time) (*model.Request, error)
+	Create(ctx context.Context, request *model.Request) (*model.Request, error)
 	Get(ctx context.Context, id *uuid.UUID) (*model.Request, error)
 	GetAll(ctx context.Context) ([]*model.Request, error)
 	GetAllWithDepartment(ctx context.Context, department *uuid.UUID) ([]*model.Request, error)
@@ -86,6 +86,7 @@ type RequestService interface {
 	GetCountWithThemeIdAndStatus(ctx context.Context, themeId string, status model.RequestStatus) (float64, error)
 	Update(ctx context.Context, request *model.Request, fileIds []*uuid.UUID) error
 	ExportExcel(ctx context.Context, departmentId *uuid.UUID) (*model.File, error)
+	Delete(ctx context.Context, id *uuid.UUID) error
 }
 
 type AnalyticsService interface {

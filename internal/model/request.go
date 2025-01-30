@@ -26,6 +26,7 @@ type Request struct {
 	UserId      *uuid.UUID      `json:"userId,omitempty"`
 	Files       []*File         `json:"files,omitempty"`
 	Deadline    *time.Time      `json:"deadline,omitempty"`
+	Comment     string          `json:"comment,omitempty"`
 	//todo
 }
 
@@ -42,6 +43,7 @@ func (r *Request) ToProto() (*protoRequest.Request, error) {
 		},
 		Address:   r.Address,
 		CreatedAt: timestamppb.New(r.CreatedAt),
+		Comment:   r.Comment,
 	}
 	if r.ThemeId != nil {
 		request.ThemeId = r.ThemeId.String()
@@ -104,4 +106,74 @@ func (r *Request) AsGeoJson() (*geojson.Feature, error) {
 		"request": r,
 	}
 	return feature, nil
+}
+
+func (r *Request) FromProto(req *protoRequest.Request) error {
+	requestId, err := uuid.Parse(req.Id)
+	if err != nil {
+		return errors.Wrap(err, "can not parse request id")
+	}
+	r.Id = requestId
+
+	r.Description = req.Description
+	r.Geo = GeoPoint{
+		Lat: float64(req.Geo.Latitude),
+		Lon: float64(req.Geo.Longitude),
+	}
+	r.Address = req.Address
+	r.CreatedAt = req.CreatedAt.AsTime()
+
+	deletedAt := req.DeletedAt.AsTime()
+	r.DeletedAt = &deletedAt
+	switch req.Status {
+	case protoRequest.Status_StatusOpen:
+		r.Status = RequestStatusOpen
+	case protoRequest.Status_StatusClosed:
+		r.Status = RequestStatusClosed
+	case protoRequest.Status_StatusDeclined:
+		r.Status = RequestStatusDeclined
+	default:
+		r.Status = RequestStatusUnknown
+	}
+	switch req.Priority {
+	case protoRequest.Priority_PriorityDefault:
+		r.Priority = RequestPriorityDefault
+	case protoRequest.Priority_PriorityLow:
+		r.Priority = RequestPriorityLow
+	case protoRequest.Priority_PriorityHigh:
+		r.Priority = RequestPriorityHigh
+	default:
+		r.Priority = RequestPriorityUnknown
+	}
+	themeId, err := uuid.Parse(req.ThemeId)
+	if err != nil {
+		return errors.Wrap(err, "can not parse theme id")
+	}
+	r.ThemeId = &themeId
+
+	var contact Contact
+	if err := contact.FromProto(req.Contact); err != nil {
+		return errors.Wrap(err, "can not convert contact from proto")
+	}
+	r.Contact = &contact
+	if userId, err := uuid.Parse(req.UserId); err == nil {
+		r.UserId = &userId
+	}
+	if req.Deadline != nil {
+		deadline := req.Deadline.AsTime()
+		r.Deadline = &deadline
+	}
+
+	r.Comment = req.Comment
+
+	var files []*File
+	for _, file := range req.GetFiles() {
+		var fileC File
+		if err := fileC.FromProto(file); err != nil {
+			return errors.Wrap(err, "can not convert file from proto")
+		}
+		files = append(files, &fileC)
+	}
+	r.Files = files
+	return nil
 }

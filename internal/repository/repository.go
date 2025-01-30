@@ -72,4 +72,5 @@ type RequestRepository interface {
 	GetCountWithThemeId(ctx context.Context, from time.Time, to time.Time, themeId string) (float64, error)
 	GetCountWithThemeIdAndStatus(ctx context.Context, themeId string, status int) (float64, error)
 	Update(ctx context.Context, request *model.Request) error
+	Delete(ctx context.Context, id string) error
 }

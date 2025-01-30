@@ -2278,30 +2278,8 @@
     "requestCreateRequest": {
       "type": "object",
       "properties": {
-        "description": {
-          "type": "string"
-        },
-        "geo": {
-          "$ref": "#/definitions/geoGeoPoint"
-        },
-        "address": {
-          "type": "string"
-        },
-        "themeId": {
-          "type": "string"
-        },
-        "contact": {
-          "$ref": "#/definitions/contactContact"
-        },
-        "files": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "deadline": {
-          "type": "string",
-          "format": "date-time"
+        "request": {
+          "$ref": "#/definitions/requestRequest"
         }
       }
     },
@@ -2405,6 +2383,9 @@
         "deadline": {
           "type": "string",
           "format": "date-time"
+        },
+        "comment": {
+          "type": "string"
         }
       }
     },

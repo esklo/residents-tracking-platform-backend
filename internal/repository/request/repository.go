@@ -324,3 +324,23 @@ func (r *Repository) Update(ctx context.Context, request *model.Request) error {
 	}
 	return nil
 }
+
+func (r *Repository) Delete(ctx context.Context, id string) error {
+	if id == "" {
+		return errors.New("id is empty")
+	}
+	connection, err := r.getConnection()
+	if err != nil {
+		return errors.Wrap(err, "can not get database connection")
+	}
+
+	_, err = connection.Exec(`
+		delete from requests where id=$1
+	`,
+		id,
+	)
+	if err != nil {
+		return errors.Wrap(err, "can not execute delete query")
+	}
+	return nil
+}

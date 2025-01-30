@@ -52,34 +52,14 @@ func (i Implementation) Create(ctx context.Context, req *proto.CreateRequest) (*
 		return nil, model.ErrorUnauthenticated
 	}
 
-	themeId, err := uuid.Parse(req.ThemeId)
-	if err != nil {
-		return nil, errors.Wrap(err, "can not parse theme id")
+	req.Request.Id = uuid.Nil.String()
+
+	requestM := model.Request{}
+	if err := requestM.FromProto(req.Request); err != nil {
+		return nil, err
 	}
 
-	var fileIds []*uuid.UUID
-	for _, file := range req.Files {
-		fileId, err := uuid.Parse(file)
-		if err != nil {
-			return nil, errors.Wrap(err, "can not parse file id")
-		}
-		fileIds = append(fileIds, &fileId)
-	}
-
-	var deadline *time.Time
-	if req.Deadline != nil {
-		d := req.Deadline.AsTime()
-		deadline = &d
-	}
-
-	request, err := i.requestService.Create(ctx, &themeId, req.Description, req.Address, &model.Contact{
-		Phone: req.Contact.Phone,
-		Email: req.Contact.Email,
-		Name:  req.Contact.Name,
-	}, model.GeoPoint{
-		Lat: float64(req.Geo.Latitude),
-		Lon: float64(req.Geo.Longitude),
-	}, fileIds, deadline)
+	request, err := i.requestService.Create(ctx, &requestM)
 	if err != nil {
 		return nil, err
 	}
@@ -202,6 +182,7 @@ func (i Implementation) Update(ctx context.Context, req *proto.UpdateRequest) (*
 		},
 		UserId:   userId,
 		Deadline: deadline,
+		Comment:  req.Request.Comment,
 	}, fileIds)
 	if err != nil {
 		return nil, err
@@ -236,4 +217,23 @@ func (i Implementation) ExportExcel(ctx context.Context, req *empty.Empty) (*pro
 		return nil, errors.Wrap(err, "can not convert file to proto")
 	}
 	return &proto.ExportResponse{File: protoFile}, nil
+}
+
+func (i Implementation) Delete(ctx context.Context, req *proto.ByIdRequest) (*empty.Empty, error) {
+	i.logger.Debug("request.Delete request")
+	_, err := i.authService.ExchangeTokenFromContext(ctx)
+	if err != nil {
+		return nil, model.ErrorUnauthenticated
+	}
+
+	requestId, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, errors.Wrap(err, "can not parse request id")
+	}
+
+	if err := i.requestService.Delete(ctx, &requestId); err != nil {
+		return nil, errors.Wrap(err, "can not delete request")
+	}
+
+	return nil, nil
 }
