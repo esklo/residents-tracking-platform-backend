@@ -86,7 +86,7 @@ message Request {
   optional contact.Contact contact = 11;
   repeated file.File files = 12;
   optional google.protobuf.Timestamp deadline = 13;
-  string comment = 14;
+  optional string comment = 14;
 }
 
 message ExportResponse {

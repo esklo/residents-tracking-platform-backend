@@ -26,7 +26,7 @@ type Request struct {
 	UserId      *uuid.UUID      `json:"userId,omitempty"`
 	Files       []*File         `json:"files,omitempty"`
 	Deadline    *time.Time      `json:"deadline,omitempty"`
-	Comment     string          `json:"comment,omitempty"`
+	Comment     *string         `json:"comment,omitempty"`
 	//todo
 }
 
