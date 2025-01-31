@@ -16,7 +16,9 @@ func (s *ServiceProvider) GetLogger() *zap.Logger {
 		defaultLogLevel := zapcore.DebugLevel
 		core := zapcore.NewTee(
 			zapcore.NewCore(fileEncoder, writer, defaultLogLevel),
+			zapcore.NewCore(fileEncoder, zapcore.Lock(os.Stdout), defaultLogLevel),
 		)
+
 		s.logger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 		defer s.logger.Sync()
 	}

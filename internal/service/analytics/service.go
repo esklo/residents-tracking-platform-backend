@@ -64,7 +64,7 @@ func (s *Service) RequestsPerTheme(ctx context.Context, from time.Time, to time.
 	}
 	var data []*model.RequestsPerTheme
 	for _, theme := range themes {
-		count, err := s.requestService.GetCountWithThemeId(ctx, from, to, theme.Id.String())
+		count, err := s.requestService.GetCountWithThemeId(ctx, from, to, &theme.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -87,7 +87,7 @@ func (s *Service) RequestsPerThemePerDate(ctx context.Context, departmentId *uui
 	for current.Before(to) {
 		to := current.Add(time.Hour * 24)
 		for _, theme := range themes {
-			count, err := s.requestService.GetCountWithThemeId(ctx, current, to, theme.Id.String())
+			count, err := s.requestService.GetCountWithThemeId(ctx, current, to, &theme.Id)
 			if err != nil {
 				return nil, err
 			}
@@ -115,7 +115,7 @@ func (s *Service) Stats(ctx context.Context, departmentId *uuid.UUID) (*model.St
 	//this week count
 	for _, theme := range themes {
 		from, to := weekRange(year, week)
-		count, err := s.requestService.GetCountWithThemeId(ctx, from, to, theme.Id.String())
+		count, err := s.requestService.GetCountWithThemeId(ctx, from, to, &theme.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -133,7 +133,7 @@ func (s *Service) Stats(ctx context.Context, departmentId *uuid.UUID) (*model.St
 			lastWeek -= 1
 		}
 		from, to := weekRange(year, lastWeek)
-		count, err := s.requestService.GetCountWithThemeId(ctx, from, to, theme.Id.String())
+		count, err := s.requestService.GetCountWithThemeId(ctx, from, to, &theme.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -153,7 +153,7 @@ func (s *Service) Stats(ctx context.Context, departmentId *uuid.UUID) (*model.St
 	for _, theme := range themes {
 		from := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, currentLocation)
 		to := from.AddDate(0, 1, -1)
-		count, err := s.requestService.GetCountWithThemeId(ctx, from, to, theme.Id.String())
+		count, err := s.requestService.GetCountWithThemeId(ctx, from, to, &theme.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -171,7 +171,7 @@ func (s *Service) Stats(ctx context.Context, departmentId *uuid.UUID) (*model.St
 		}
 		from := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, currentLocation)
 		to := from.AddDate(0, 1, -1)
-		count, err := s.requestService.GetCountWithThemeId(ctx, from, to, theme.Id.String())
+		count, err := s.requestService.GetCountWithThemeId(ctx, from, to, &theme.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -185,7 +185,7 @@ func (s *Service) Stats(ctx context.Context, departmentId *uuid.UUID) (*model.St
 
 	var openCount float64
 	for _, theme := range themes {
-		count, err := s.requestService.GetCountWithThemeIdAndStatus(ctx, theme.Id.String(), model.RequestStatusOpen)
+		count, err := s.requestService.GetCountWithThemeIdAndStatus(ctx, &theme.Id, model.RequestStatusOpen)
 		if err != nil {
 			return nil, err
 		}

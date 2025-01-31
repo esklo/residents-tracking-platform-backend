@@ -7,14 +7,14 @@ import (
 	"go.uber.org/zap"
 )
 
-func (s *Service) Get(ctx context.Context, id string) (*model.User, error) {
+func (s *Service) Get(ctx context.Context, id *uuid.UUID) (*model.User, error) {
 	user, err := s.userRepository.GetByID(ctx, id)
 	if err != nil {
 		s.logger.Error("user get error", zap.Error(err))
 		return nil, err
 	}
 	if user == nil {
-		s.logger.Error("user with id not found", zap.String("id", id))
+		s.logger.Error("user with id not found", zap.Any("id", id))
 		return nil, model.ErrorNotFound
 	}
 

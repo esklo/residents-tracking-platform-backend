@@ -4,6 +4,8 @@ import (
 	"context"
 	proto "github.com/esklo/residents-tracking-platform-backend/gen/proto/user"
 	"github.com/esklo/residents-tracking-platform-backend/internal/model"
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 func (i *Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*proto.User, error) {
@@ -13,7 +15,12 @@ func (i *Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*
 		return nil, model.ErrorUnauthenticated
 	}
 
-	user, err := i.userService.Get(ctx, req.Id)
+	userId, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, errors.Wrap(err, "can not parse user id")
+	}
+
+	user, err := i.userService.Get(ctx, &userId)
 	if err != nil {
 		return nil, err
 	}

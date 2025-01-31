@@ -15,7 +15,12 @@ func (i *Implementation) Update(ctx context.Context, req *proto.UpdateRequest) (
 		return nil, model.ErrorUnauthenticated
 	}
 
-	user, err := i.userService.Get(ctx, req.Id)
+	userId, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, errors.Wrap(err, "can not parse user id")
+	}
+
+	user, err := i.userService.Get(ctx, &userId)
 	if err != nil {
 		return nil, err
 	}

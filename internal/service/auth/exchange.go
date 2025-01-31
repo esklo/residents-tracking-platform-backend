@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/esklo/residents-tracking-platform-backend/internal/model"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"google.golang.org/grpc/metadata"
 	"strings"
 )
@@ -23,7 +25,12 @@ func (s *Service) ExchangeToken(ctx context.Context, tokenString string) (*model
 		if err != nil {
 			return nil, err
 		}
-		user, err := s.userRepository.GetByID(ctx, sub)
+
+		userId, err := uuid.Parse(sub)
+		if err != nil {
+			return nil, errors.Wrap(err, "can not parse user id")
+		}
+		user, err := s.userRepository.GetByID(ctx, &userId)
 		if err != nil {
 			return nil, err
 		}

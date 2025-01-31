@@ -9,7 +9,7 @@ import (
 )
 
 type UserRepository interface {
-	GetByID(ctx context.Context, id string) (*model.User, error)
+	GetByID(ctx context.Context, id *uuid.UUID) (*model.User, error)
 	Create(ctx context.Context, user *model.User) (*model.User, error)
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	Update(ctx context.Context, user *model.User) error
@@ -62,15 +62,15 @@ type ContactRepository interface {
 }
 
 type RequestRepository interface {
-	GetByID(ctx context.Context, id string) (*model.Request, error)
+	GetByID(ctx context.Context, id *uuid.UUID) (*model.Request, error)
 	Create(ctx context.Context, request *model.Request) (*model.Request, error)
 	GetAll(ctx context.Context) ([]*model.Request, error)
-	GetAllWithThemeIds(ctx context.Context, themeIds []string) ([]*model.Request, error)
-	GetFiles(ctx context.Context, id string) ([]*uuid.UUID, error)
-	AddFile(ctx context.Context, requestId, fileId string) error
-	RemoveFile(ctx context.Context, requestId, fileId string) error
-	GetCountWithThemeId(ctx context.Context, from time.Time, to time.Time, themeId string) (float64, error)
-	GetCountWithThemeIdAndStatus(ctx context.Context, themeId string, status int) (float64, error)
+	GetAllWithThemeIds(ctx context.Context, themeIds []*uuid.UUID) ([]*model.Request, error)
+	GetFiles(ctx context.Context, id *uuid.UUID) ([]*uuid.UUID, error)
+	AddFile(ctx context.Context, requestId, fileId *uuid.UUID) error
+	RemoveFile(ctx context.Context, requestId, fileId *uuid.UUID) error
+	GetCountWithThemeId(ctx context.Context, from time.Time, to time.Time, themeId *uuid.UUID) (float64, error)
+	GetCountWithThemeIdAndStatus(ctx context.Context, themeId *uuid.UUID, status int) (float64, error)
 	Update(ctx context.Context, request *model.Request) error
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, id *uuid.UUID) error
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
-	"time"
 )
 
 type Implementation struct {
@@ -95,95 +94,12 @@ func (i Implementation) Update(ctx context.Context, req *proto.UpdateRequest) (*
 		return nil, model.ErrorUnauthenticated
 	}
 
-	requestId, err := uuid.Parse(req.Request.Id)
-	if err != nil {
-		return nil, errors.Wrap(err, "can not parse request id")
+	var request model.Request
+	if err := request.FromProto(req.Request); err != nil {
+		return nil, err
 	}
 
-	themeId, err := uuid.Parse(req.Request.ThemeId)
-	if err != nil {
-		return nil, errors.Wrap(err, "can not parse theme id")
-	}
-
-	var userId *uuid.UUID
-	if req.Request.UserId != "" {
-		userIdP, err := uuid.Parse(req.Request.UserId)
-		if err != nil {
-			return nil, errors.Wrap(err, "can not parse user id")
-		}
-		userId = &userIdP
-	}
-
-	var contactId uuid.UUID
-	if req.Request.Contact.Id != "" {
-		contactId, err = uuid.Parse(req.Request.Contact.Id)
-		if err != nil {
-			return nil, errors.Wrap(err, "can not parse contact id")
-		}
-	}
-
-	var fileIds []*uuid.UUID
-	for _, file := range req.Files {
-		fileId, err := uuid.Parse(file)
-		if err != nil {
-			return nil, errors.Wrap(err, "can not parse file id")
-		}
-		fileIds = append(fileIds, &fileId)
-	}
-
-	var requestStatus = model.RequestStatusUnknown
-	switch req.Request.Status {
-	case 1:
-		requestStatus = model.RequestStatusOpen
-		break
-	case 2:
-		requestStatus = model.RequestStatusClosed
-		break
-	case 3:
-		requestStatus = model.RequestStatusDeclined
-		break
-	}
-
-	var requestPriority = model.RequestPriorityUnknown
-	switch req.Request.Priority {
-	case 1:
-		requestPriority = model.RequestPriorityDefault
-		break
-	case 2:
-		requestPriority = model.RequestPriorityLow
-		break
-	case 3:
-		requestPriority = model.RequestPriorityHigh
-		break
-	}
-
-	var deadline *time.Time
-	if req.Request.Deadline != nil {
-		d := req.Request.Deadline.AsTime()
-		deadline = &d
-	}
-
-	err = i.requestService.Update(ctx, &model.Request{
-		Id:          requestId,
-		Description: req.Request.Description,
-		Geo: model.GeoPoint{
-			Lat: float64(req.Request.Geo.Latitude),
-			Lon: float64(req.Request.Geo.Longitude),
-		},
-		Address:  req.Request.Address,
-		Status:   requestStatus,
-		Priority: requestPriority,
-		ThemeId:  &themeId,
-		Contact: &model.Contact{
-			Id:    contactId,
-			Phone: req.Request.Contact.Phone,
-			Email: req.Request.Contact.Email,
-			Name:  req.Request.Contact.Name,
-		},
-		UserId:   userId,
-		Deadline: deadline,
-		Comment:  req.Request.Comment,
-	}, fileIds)
+	err = i.requestService.Update(ctx, &request)
 	if err != nil {
 		return nil, err
 	}

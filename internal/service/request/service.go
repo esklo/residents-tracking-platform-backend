@@ -65,12 +65,12 @@ func (s *Service) Create(ctx context.Context, request *model.Request) (*model.Re
 		return nil, err
 	}
 	for _, file := range request.Files {
-		file, err := s.fileService.GetById(ctx, &file.Id)
+		fileModel, err := s.fileService.GetById(ctx, &file.Id)
 		if err != nil {
 			return nil, err
 		}
-		request.Files = append(request.Files, file)
-		err = s.requestRepository.AddFile(ctx, request.Id.String(), file.Id.String())
+		request.Files = append(request.Files, fileModel)
+		err = s.requestRepository.AddFile(ctx, &request.Id, &file.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -79,7 +79,7 @@ func (s *Service) Create(ctx context.Context, request *model.Request) (*model.Re
 }
 
 func (s *Service) Get(ctx context.Context, id *uuid.UUID) (*model.Request, error) {
-	request, err := s.requestRepository.GetByID(ctx, id.String())
+	request, err := s.requestRepository.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (s *Service) Get(ctx context.Context, id *uuid.UUID) (*model.Request, error
 		return nil, err
 	}
 	request.Contact = contact
-	fileIds, err := s.requestRepository.GetFiles(ctx, id.String())
+	fileIds, err := s.requestRepository.GetFiles(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (s *Service) GetAll(ctx context.Context) ([]*model.Request, error) {
 		}
 		request.Contact = contact
 
-		fileIds, err := s.requestRepository.GetFiles(ctx, request.Id.String())
+		fileIds, err := s.requestRepository.GetFiles(ctx, &request.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -143,9 +143,9 @@ func (s *Service) GetAllWithDepartment(ctx context.Context, departmentId *uuid.U
 	if err != nil {
 		return nil, err
 	}
-	var themeIds []string
+	var themeIds []*uuid.UUID
 	for _, theme := range themes {
-		themeIds = append(themeIds, theme.Id.String())
+		themeIds = append(themeIds, &theme.Id)
 	}
 	requests, err := s.requestRepository.GetAllWithThemeIds(ctx, themeIds)
 
@@ -159,7 +159,7 @@ func (s *Service) GetAllWithDepartment(ctx context.Context, departmentId *uuid.U
 		}
 		request.Contact = contact
 
-		fileIds, err := s.requestRepository.GetFiles(ctx, request.Id.String())
+		fileIds, err := s.requestRepository.GetFiles(ctx, &request.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -192,15 +192,15 @@ func (s *Service) GetAllAsGeoJsonWithDepartment(ctx context.Context, department 
 	return collection.MarshalJSON()
 }
 
-func (s *Service) GetCountWithThemeId(ctx context.Context, from time.Time, to time.Time, themeId string) (float64, error) {
+func (s *Service) GetCountWithThemeId(ctx context.Context, from time.Time, to time.Time, themeId *uuid.UUID) (float64, error) {
 	return s.requestRepository.GetCountWithThemeId(ctx, from, to, themeId)
 }
-func (s *Service) GetCountWithThemeIdAndStatus(ctx context.Context, themeId string, status model.RequestStatus) (float64, error) {
+func (s *Service) GetCountWithThemeIdAndStatus(ctx context.Context, themeId *uuid.UUID, status model.RequestStatus) (float64, error) {
 	return s.requestRepository.GetCountWithThemeIdAndStatus(ctx, themeId, int(status))
 }
 
-func (s *Service) Update(ctx context.Context, request *model.Request, fileIds []*uuid.UUID) error {
-	requestOG, err := s.requestRepository.GetByID(ctx, request.Id.String())
+func (s *Service) Update(ctx context.Context, request *model.Request) error {
+	requestOG, err := s.requestRepository.GetByID(ctx, &request.Id)
 	if err != nil {
 		return errors.Wrap(err, "can not get requestOG")
 	}
@@ -224,23 +224,23 @@ func (s *Service) Update(ctx context.Context, request *model.Request, fileIds []
 		}
 	}
 
-	currentFileIds, err := s.requestRepository.GetFiles(ctx, request.Id.String())
+	currentFileIds, err := s.requestRepository.GetFiles(ctx, &request.Id)
 	if err != nil {
 		return errors.Wrap(err, "can not get request's files")
 	}
 	for _, fileId := range currentFileIds {
-		err := s.requestRepository.RemoveFile(ctx, request.Id.String(), fileId.String())
+		err := s.requestRepository.RemoveFile(ctx, &request.Id, fileId)
 		if err != nil {
 			return errors.Wrap(err, "can not remove file")
 		}
 	}
-	for _, fileId := range fileIds {
-		file, err := s.fileService.GetById(ctx, fileId)
+	for _, file := range request.Files {
+		fileModel, err := s.fileService.GetById(ctx, &file.Id)
 		if err != nil {
 			return errors.Wrap(err, "can not get file by id")
 		}
-		request.Files = append(request.Files, file)
-		err = s.requestRepository.AddFile(ctx, request.Id.String(), fileId.String())
+		request.Files = append(request.Files, fileModel)
+		err = s.requestRepository.AddFile(ctx, &request.Id, &file.Id)
 		if err != nil {
 			return errors.Wrap(err, "can not add file")
 		}
@@ -300,7 +300,7 @@ func (s *Service) ExportExcel(ctx context.Context, departmentId *uuid.UUID) (*mo
 		row = appendExcelRow(row, dep.Title)
 		row = appendExcelRow(row, request.UserId)
 		if request.UserId != nil {
-			user, _ := s.userService.Get(ctx, request.UserId.String())
+			user, _ := s.userService.Get(ctx, request.UserId)
 			row = appendExcelRow(row, *user.LastName)
 			row = appendExcelRow(row, user.FirstName)
 			row = appendExcelRow(row, *user.FatherName)
@@ -349,12 +349,12 @@ func appendExcelRow(row []any, value any) []any {
 }
 
 func (s *Service) Delete(ctx context.Context, id *uuid.UUID) error {
-	files, err := s.requestRepository.GetFiles(ctx, id.String())
+	files, err := s.requestRepository.GetFiles(ctx, id)
 	if err != nil {
 		return errors.Wrap(err, "can not get request's files")
 	}
 	for _, fileId := range files {
-		if err := s.requestRepository.RemoveFile(ctx, id.String(), fileId.String()); err != nil {
+		if err := s.requestRepository.RemoveFile(ctx, id, fileId); err != nil {
 			return errors.Wrap(err, "can not remove file")
 		}
 
@@ -362,5 +362,5 @@ func (s *Service) Delete(ctx context.Context, id *uuid.UUID) error {
 			return errors.Wrap(err, "can not delete file")
 		}
 	}
-	return s.requestRepository.Delete(ctx, id.String())
+	return s.requestRepository.Delete(ctx, id)
 }

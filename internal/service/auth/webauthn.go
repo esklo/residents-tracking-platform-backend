@@ -118,12 +118,17 @@ func (s *Service) PublicKeyAssertion(ctx context.Context, flowId []byte, credent
 
 	var user *model.User
 	discoverableLogin, err := s.webAuthn.ValidateDiscoverableLogin(func(_, userHandle []byte) (webauthn.User, error) {
-		userId, err := s.webAuthnRepository.GetUserIdByCredentialId(ctx, userHandle)
+		userIdString, err := s.webAuthnRepository.GetUserIdByCredentialId(ctx, userHandle)
 		if err != nil {
 			return nil, err
 		}
 
-		user, err = s.userRepository.GetByID(ctx, userId)
+		userId, err := uuid.Parse(userIdString)
+		if err != nil {
+			return nil, errors.Wrap(err, "can not parse user id")
+		}
+
+		user, err = s.userRepository.GetByID(ctx, &userId)
 		if err != nil {
 			return nil, err
 		}

@@ -23,7 +23,7 @@ func NewRepository(getConnection func() (*sql.DB, error)) *Repository {
 	}
 }
 
-func (r *Repository) GetByID(_ context.Context, id string) (*model.User, error) {
+func (r *Repository) GetByID(_ context.Context, id *uuid.UUID) (*model.User, error) {
 	connection, err := r.getConnection()
 	if err != nil {
 		return nil, errors.Wrap(err, "user get by id: can not get database connection")
