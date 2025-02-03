@@ -79,7 +79,7 @@ func (r *Repository) Create(ctx context.Context, request *model.Request) (*model
 
 	_, err = connection.Exec(`
 		insert into requests (id, description, geo, address, created_at, deleted_at, status, priority, theme_id, user_id, contact_id,deadline,comment) 
-		values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+		values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
 	`,
 		request.Id,
 		request.Description,
