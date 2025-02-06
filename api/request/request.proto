@@ -41,7 +41,6 @@ message CreateRequest {
 
 message UpdateRequest {
   Request request = 1;
-  repeated string files = 2;
 }
 
 message ByIdRequest {
@@ -87,6 +86,7 @@ message Request {
   repeated file.File files = 12;
   optional google.protobuf.Timestamp deadline = 13;
   optional string comment = 14;
+  repeated file.File report_files = 15;
 }
 
 message ExportResponse {

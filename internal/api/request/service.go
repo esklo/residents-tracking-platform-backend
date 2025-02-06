@@ -39,7 +39,7 @@ func (i Implementation) GetById(ctx context.Context, req *proto.ByIdRequest) (*p
 	}
 	request, err := i.requestService.Get(ctx, &requestId)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "can not get request by id")
 	}
 	return request.ToProto()
 }

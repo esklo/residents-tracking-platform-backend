@@ -69,6 +69,11 @@ type RequestRepository interface {
 	GetFiles(ctx context.Context, id *uuid.UUID) ([]*uuid.UUID, error)
 	AddFile(ctx context.Context, requestId, fileId *uuid.UUID) error
 	RemoveFile(ctx context.Context, requestId, fileId *uuid.UUID) error
+
+	GetReportFiles(ctx context.Context, id *uuid.UUID) ([]*uuid.UUID, error)
+	AddReportFile(ctx context.Context, requestId, fileId *uuid.UUID) error
+	RemoveReportFile(ctx context.Context, requestId, fileId *uuid.UUID) error
+
 	GetCountWithThemeId(ctx context.Context, from time.Time, to time.Time, themeId *uuid.UUID) (float64, error)
 	GetCountWithThemeIdAndStatus(ctx context.Context, themeId *uuid.UUID, status int) (float64, error)
 	Update(ctx context.Context, request *model.Request) error

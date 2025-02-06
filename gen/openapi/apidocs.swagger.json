@@ -2386,6 +2386,13 @@
         },
         "comment": {
           "type": "string"
+        },
+        "reportFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/fileFile"
+          }
         }
       }
     },

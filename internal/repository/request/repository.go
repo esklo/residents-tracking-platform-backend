@@ -106,7 +106,7 @@ func (r *Repository) GetAll(ctx context.Context) ([]*model.Request, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "can not get database connection")
 	}
-	rows, err := connection.Query("select id, description, ST_AsEWKB(geo), address, created_at, deleted_at, status, priority, theme_id, user_id, contact_id, deadline,comment from requests")
+	rows, err := connection.Query("select id, description, ST_AsEWKB(geo), address, created_at, deleted_at, status, priority, theme_id, user_id, contact_id, deadline,comment from requests where deleted_at is null")
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func (r *Repository) GetAllWithThemeIds(ctx context.Context, themeIds []*uuid.UU
 	}
 
 	rows, err := connection.Query(
-		fmt.Sprintf("select id, description, ST_AsEWKB(geo), address, created_at, deleted_at, status, priority, theme_id, user_id, contact_id, deadline, comment from requests where theme_id in (%s)", fmt.Sprintf("'%s'", strings.Join(themeIdsStrings, "','"))))
+		fmt.Sprintf("select id, description, ST_AsEWKB(geo), address, created_at, deleted_at, status, priority, theme_id, user_id, contact_id, deadline, comment from requests where theme_id in (%s) and deleted_at is null", fmt.Sprintf("'%s'", strings.Join(themeIdsStrings, "','"))))
 	if err != nil {
 		return nil, err
 	}
@@ -269,6 +269,67 @@ func (r *Repository) RemoveFile(ctx context.Context, requestId, fileId *uuid.UUI
 	return nil
 }
 
+func (r *Repository) GetReportFiles(ctx context.Context, id *uuid.UUID) ([]*uuid.UUID, error) {
+	connection, err := r.getConnection()
+	if err != nil {
+		return nil, errors.Wrap(err, "can not get database connection")
+	}
+	rows, err := connection.Query("select file_id from requests_report_files where request_id = $1", id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var fileIds []*uuid.UUID
+	for rows.Next() {
+		var fileId uuid.UUID
+		err := rows.Scan(
+			&fileId,
+		)
+		if err != nil {
+			return nil, err
+		}
+		fileIds = append(fileIds, &fileId)
+	}
+	return fileIds, nil
+}
+
+func (r *Repository) AddReportFile(ctx context.Context, requestId, fileId *uuid.UUID) error {
+	connection, err := r.getConnection()
+	if err != nil {
+		return errors.Wrap(err, "can not get database connection")
+	}
+
+	_, err = connection.Exec(`
+		insert into requests_report_files (request_id, file_id) 
+		values ($1,$2)
+	`,
+		requestId,
+		fileId,
+	)
+	if err != nil {
+		return errors.Wrap(err, "can not execute create query")
+	}
+	return nil
+}
+
+func (r *Repository) RemoveReportFile(ctx context.Context, requestId, fileId *uuid.UUID) error {
+	connection, err := r.getConnection()
+	if err != nil {
+		return errors.Wrap(err, "can not get database connection")
+	}
+
+	_, err = connection.Exec(`
+		delete from requests_report_files where request_id=$1 and file_id=$2
+	`,
+		requestId,
+		fileId,
+	)
+	if err != nil {
+		return errors.Wrap(err, "can not execute delete query")
+	}
+	return nil
+}
+
 func (r *Repository) GetCountWithThemeId(ctx context.Context, from time.Time, to time.Time, themeId *uuid.UUID) (float64, error) {
 	connection, err := r.getConnection()
 	if err != nil {
@@ -276,7 +337,7 @@ func (r *Repository) GetCountWithThemeId(ctx context.Context, from time.Time, to
 	}
 
 	var count float64
-	err = connection.QueryRow(`select count(*) from requests where theme_id = $1 and created_at >= $2 and created_at < $3`, themeId, from, to).
+	err = connection.QueryRow(`select count(*) from requests where theme_id = $1 and created_at >= $2 and created_at < $3 and deleted_at is null`, themeId, from, to).
 		Scan(
 			&count,
 		)
@@ -294,7 +355,7 @@ func (r *Repository) GetCountWithThemeIdAndStatus(ctx context.Context, themeId *
 	}
 
 	var count float64
-	err = connection.QueryRow(`select count(*) from requests where theme_id = $1 and status = $2`, themeId, status).
+	err = connection.QueryRow(`select count(*) from requests where theme_id = $1 and status = $2 and deleted_at is null`, themeId, status).
 		Scan(
 			&count,
 		)
@@ -315,7 +376,7 @@ func (r *Repository) Update(ctx context.Context, request *model.Request) error {
 	}
 
 	_, err = connection.Exec(`
-		update requests set description=$2, geo=$3, address=$4, status=$5, priority=$6, theme_id=$7, user_id=$8, contact_id=$9,deadline=$10,comment=$11
+		update requests set description=$2, geo=$3, address=$4, status=$5, priority=$6, theme_id=$7, user_id=$8, contact_id=$9,deadline=$10,comment=$11,deleted_at=$12
 		where id=$1
 	`,
 		request.Id,
@@ -329,6 +390,7 @@ func (r *Repository) Update(ctx context.Context, request *model.Request) error {
 		request.Contact.Id,
 		request.Deadline,
 		request.Comment,
+		request.DeletedAt,
 	)
 	if err != nil {
 		return errors.Wrap(err, "can not execute update query")

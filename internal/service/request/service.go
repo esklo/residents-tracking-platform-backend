@@ -75,32 +75,58 @@ func (s *Service) Create(ctx context.Context, request *model.Request) (*model.Re
 			return nil, err
 		}
 	}
+
+	for _, file := range request.ReportFiles {
+		fileModel, err := s.fileService.GetById(ctx, &file.Id)
+		if err != nil {
+			return nil, err
+		}
+		request.ReportFiles = append(request.ReportFiles, fileModel)
+		err = s.requestRepository.AddReportFile(ctx, &request.Id, &file.Id)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return request, nil
 }
 
 func (s *Service) Get(ctx context.Context, id *uuid.UUID) (*model.Request, error) {
 	request, err := s.requestRepository.GetByID(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "can not get request by id")
 	}
 	contact, err := s.contactService.Get(ctx, &request.Contact.Id)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "can not get contact by id")
 	}
 	request.Contact = contact
 	fileIds, err := s.requestRepository.GetFiles(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "can not get files by id")
 	}
 	var files []*model.File
 	for _, fileId := range fileIds {
 		file, err := s.fileService.GetById(ctx, fileId)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "can not get file by id")
 		}
 		files = append(files, file)
 	}
 	request.Files = files
+
+	reportFileIds, err := s.requestRepository.GetReportFiles(ctx, id)
+	if err != nil {
+		return nil, errors.Wrap(err, "can not get report files by id")
+	}
+	var reportFiles []*model.File
+	for _, reportFileId := range reportFileIds {
+		file, err := s.fileService.GetById(ctx, reportFileId)
+		if err != nil {
+			return nil, errors.Wrap(err, "can not get report file by id")
+		}
+		reportFiles = append(reportFiles, file)
+	}
+	request.ReportFiles = reportFiles
 	return request, nil
 }
 
@@ -129,6 +155,20 @@ func (s *Service) GetAll(ctx context.Context) ([]*model.Request, error) {
 			files = append(files, file)
 		}
 		request.Files = files
+
+		reportFileIds, err := s.requestRepository.GetReportFiles(ctx, &request.Id)
+		if err != nil {
+			return nil, err
+		}
+		var reportFiles []*model.File
+		for _, fileId := range reportFileIds {
+			file, err := s.fileService.GetById(ctx, fileId)
+			if err != nil {
+				return nil, err
+			}
+			reportFiles = append(reportFiles, file)
+		}
+		request.ReportFiles = reportFiles
 	}
 	return requests, nil
 }
@@ -172,6 +212,20 @@ func (s *Service) GetAllWithDepartment(ctx context.Context, departmentId *uuid.U
 			files = append(files, file)
 		}
 		request.Files = files
+
+		reportFileIds, err := s.requestRepository.GetFiles(ctx, &request.Id)
+		if err != nil {
+			return nil, err
+		}
+		var reportFiles []*model.File
+		for _, fileId := range reportFileIds {
+			file, err := s.fileService.GetById(ctx, fileId)
+			if err != nil {
+				return nil, err
+			}
+			reportFiles = append(reportFiles, file)
+		}
+		request.ReportFiles = reportFiles
 	}
 	return requests, nil
 }
@@ -243,6 +297,29 @@ func (s *Service) Update(ctx context.Context, request *model.Request) error {
 		err = s.requestRepository.AddFile(ctx, &request.Id, &file.Id)
 		if err != nil {
 			return errors.Wrap(err, "can not add file")
+		}
+	}
+
+	currentReportFileIds, err := s.requestRepository.GetReportFiles(ctx, &request.Id)
+	if err != nil {
+		return errors.Wrap(err, "can not get request's report files")
+	}
+	s.logger.Warn("currentReportFileIds", zap.Any("currentReportFileIds", currentReportFileIds))
+	for _, fileId := range currentReportFileIds {
+		err := s.requestRepository.RemoveReportFile(ctx, &request.Id, fileId)
+		if err != nil {
+			return errors.Wrap(err, "can not remove report file")
+		}
+	}
+	for _, file := range request.ReportFiles {
+		fileModel, err := s.fileService.GetById(ctx, &file.Id)
+		if err != nil {
+			return errors.Wrap(err, "can not get report file by id")
+		}
+		request.ReportFiles = append(request.ReportFiles, fileModel)
+		err = s.requestRepository.AddReportFile(ctx, &request.Id, &file.Id)
+		if err != nil {
+			return errors.Wrap(err, "can not add report file")
 		}
 	}
 	return nil
@@ -349,18 +426,21 @@ func appendExcelRow(row []any, value any) []any {
 }
 
 func (s *Service) Delete(ctx context.Context, id *uuid.UUID) error {
-	files, err := s.requestRepository.GetFiles(ctx, id)
+	request, err := s.requestRepository.GetByID(ctx, id)
 	if err != nil {
-		return errors.Wrap(err, "can not get request's files")
+		return errors.Wrap(err, "can not get request by id")
 	}
-	for _, fileId := range files {
-		if err := s.requestRepository.RemoveFile(ctx, id, fileId); err != nil {
-			return errors.Wrap(err, "can not remove file")
-		}
-
-		if err := s.fileService.Delete(ctx, fileId); err != nil {
-			return errors.Wrap(err, "can not delete file")
-		}
-	}
-	return s.requestRepository.Delete(ctx, id)
+	//for _, fileId := range files {
+	//	if err := s.requestRepository.RemoveFile(ctx, id, fileId); err != nil {
+	//		return errors.Wrap(err, "can not remove file")
+	//	}
+	//
+	//	if err := s.fileService.Delete(ctx, fileId); err != nil {
+	//		return errors.Wrap(err, "can not delete file")
+	//	}
+	//}
+	//return s.requestRepository.Delete(ctx, id)
+	t := time.Now()
+	request.DeletedAt = &t
+	return s.requestRepository.Update(ctx, request)
 }

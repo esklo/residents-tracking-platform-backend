@@ -25,6 +25,7 @@ type Request struct {
 	Contact     *Contact        `json:"contact,omitempty"`
 	UserId      *uuid.UUID      `json:"userId,omitempty"`
 	Files       []*File         `json:"files,omitempty"`
+	ReportFiles []*File         `json:"report_files,omitempty"`
 	Deadline    *time.Time      `json:"deadline,omitempty"`
 	Comment     *string         `json:"comment,omitempty"`
 	//todo
@@ -93,6 +94,16 @@ func (r *Request) ToProto() (*protoRequest.Request, error) {
 		protoFiles = append(protoFiles, protoFile)
 	}
 	request.Files = protoFiles
+
+	var protoReportFiles []*proto.File
+	for _, file := range r.ReportFiles {
+		protoReportFile, err := file.ToProto()
+		if err != nil {
+			return nil, err
+		}
+		protoReportFiles = append(protoReportFiles, protoReportFile)
+	}
+	request.ReportFiles = protoReportFiles
 	return &request, nil
 }
 
@@ -123,8 +134,10 @@ func (r *Request) FromProto(req *protoRequest.Request) error {
 	r.Address = req.Address
 	r.CreatedAt = req.CreatedAt.AsTime()
 
-	deletedAt := req.DeletedAt.AsTime()
-	r.DeletedAt = &deletedAt
+	if req.DeletedAt != nil {
+		deletedAt := req.DeletedAt.AsTime()
+		r.DeletedAt = &deletedAt
+	}
 	switch req.Status {
 	case protoRequest.Status_StatusOpen:
 		r.Status = RequestStatusOpen
@@ -175,5 +188,15 @@ func (r *Request) FromProto(req *protoRequest.Request) error {
 		files = append(files, &fileC)
 	}
 	r.Files = files
+
+	var reportFiles []*File
+	for _, file := range req.GetReportFiles() {
+		var fileC File
+		if err := fileC.FromProto(file); err != nil {
+			return errors.Wrap(err, "can not convert file from proto")
+		}
+		reportFiles = append(reportFiles, &fileC)
+	}
+	r.ReportFiles = reportFiles
 	return nil
 }

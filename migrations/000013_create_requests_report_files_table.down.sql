@@ -1,0 +1,1 @@
+drop table requests_report_files;
